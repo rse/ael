@@ -77,7 +77,7 @@ export default class AELError extends Error {
             report = `${this.name}:`
             if (this.line)   report += ` line ${this.line}`
             if (this.column) report += `, column ${this.column}:`
-            report += this.message
+            report += ` ${this.message}`
         }
         return report
     }
