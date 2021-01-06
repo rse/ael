@@ -161,44 +161,33 @@ export default class AELEval extends AELTrace {
         return result
     }
 
-    evalSelect (N) {
+    evalSelect (N, provideParent = false) {
         this.traceBegin(N)
+        let parent
         let result = this.eval(N.child(0))
         for (const child of N.childs(1)) {
             if (typeof result !== "object")
                 throw new Error("selector base object does not evaluate into an object")
             const selector = this.eval(child)
             const key = util.coerce(selector, "string")
+            parent = result
             result = result[key]
         }
         this.traceEnd(N, result)
-        return result
+        return provideParent ? [ parent, result ] : result
     }
 
     evalFuncCall (N) {
         this.traceBegin(N)
         let S = N.child(0)
-
-        this.traceBegin(S)
-        let ctx = null
+        let ctx
         let fn  = null
-        if (S.type() === "Variable")
+        if (S.type() === "Select")
+            [ ctx, fn ] = this.evalSelect(S, true)
+        else
             fn = this.eval(S)
-        else if (S.type() === "Select") {
-            fn = this.eval(S.child(0))
-            for (const child of S.childs(1)) {
-                if (typeof fn !== "object")
-                    throw new Error("selector base object does not evaluate into an object")
-                const selector = this.eval(child)
-                const key = util.coerce(selector, "string")
-                ctx = fn
-                fn = fn[key]
-            }
-        }
-        this.traceEnd(S, fn)
         if (typeof fn !== "function")
-            throw new Error("selector tail object does not evaluate into a function")
-
+            throw new Error("object does not evaluate into a function")
         let args = []
         N.childs().forEach((child) => {
             args.push(this.eval(child))
