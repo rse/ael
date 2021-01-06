@@ -1,6 +1,6 @@
 {
     "name":        "ael",
-    "version":     "0.0.2",
+    "version":     "0.0.3",
     "description": "Advanced Expression Language",
     "keywords":    [ "expression", "language", "evaluation" ],
     "license":     "MIT",
