@@ -23,10 +23,20 @@
 */
 
 /*  load external depdendencies  */
-import CacheLRU  from "cache-lru"
+import CacheLRU    from "cache-lru"
+import ASTY        from "asty"
+import PEGUtil     from "pegjs-util"
 
-/*  load internal dependencies  */
-import AELExpr   from "./ael-expr.js"
+/*  get expression evaluator  */
+import AELEval     from "./ael-eval.js"
+
+/*  get expression parser (by loading and on-the-fly compiling PEG.js grammar)  */
+const PEG = require("pegjs-otf")
+const AELParser = PEG.generateFromFile(
+    /* eslint node/no-path-concat: off */
+    __dirname + "/ael-parse.pegjs",
+    { optimize: "speed", cache: true }
+)
 
 /*  define the API class  */
 class AEL {
@@ -54,8 +64,25 @@ class AEL {
             trace = false
         let ast = this._cache.get(expr)
         if (ast === undefined) {
-            ast = new AELExpr()
-            ast.compile(expr, trace)
+            if (trace)
+                console.log("AEL: compile: +---(expression)------------------------" +
+                    "----------------------------------------------------------------\n" +
+                    expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+            const asty = new ASTY()
+            let result = PEGUtil.parse(AELParser, expr, {
+                startRule: "expression",
+                makeAST: (line, column, offset, args) => {
+                    return asty.create.apply(asty, args).pos(line, column, offset)
+                }
+            })
+            if (result.error !== null)
+                throw new Error("AEL: compile: expression parsing failed:\n" +
+                    PEGUtil.errorMessage(result.error, true).replace(/^/mg, "ERROR: "))
+            ast = result.ast
+            if (trace)
+                console.log("AEL: compile: +---(AST)-------------------------------" +
+                    "----------------------------------------------------------------\n" +
+                    ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
             this._cache.set(expr, ast)
         }
         return ast
@@ -71,7 +98,12 @@ class AEL {
             vars = {}
         if (trace === undefined)
             trace = false
-        return ast.execute(vars, trace)
+        if (trace)
+            console.log("AEL: execute: +---(result)----------------------------" +
+                "----------------------------------------------------------------")
+        const evaluator = new AELEval(vars, trace)
+        const result = evaluator.eval(ast)
+        return result
     }
 
     /*  all-in-one step  */
