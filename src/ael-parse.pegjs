@@ -232,9 +232,9 @@ stringEscapedCharSQ "escaped single-quoted-string character"
     =   "\\'"  { return "'"    }
 
 regexp "regular expression literal"
-    =   "`" re:$(("\\`" / [^`])*) "`" {
+    =   "/" re:$(("\\/" / [^/])*) "/" {
             var v
-            try { v = new RegExp(re.replace(/\\`/g, "`")) }
+            try { v = new RegExp(re.replace(/\\\//g, "/")) }
             catch (e) { error(e.message) }
             return ast("LiteralRegExp").set({ value: v })
         }
