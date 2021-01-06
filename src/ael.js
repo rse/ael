@@ -65,7 +65,7 @@ class AEL {
         let ast = this._cache.get(expr)
         if (ast === undefined) {
             if (trace)
-                console.log("AEL: compile: +---(expression)------------------------" +
+                console.log("AEL: compile: +---(expression string)-----------------" +
                     "----------------------------------------------------------------\n" +
                     expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
             const asty = new ASTY()
@@ -80,7 +80,7 @@ class AEL {
                     PEGUtil.errorMessage(result.error, true).replace(/^/mg, "ERROR: "))
             ast = result.ast
             if (trace)
-                console.log("AEL: compile: +---(AST)-------------------------------" +
+                console.log("AEL: compile: +---(abstract syntax tree)--------------" +
                     "----------------------------------------------------------------\n" +
                     ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
             this._cache.set(expr, ast)
@@ -99,7 +99,7 @@ class AEL {
         if (trace === undefined)
             trace = false
         if (trace)
-            console.log("AEL: execute: +---(result)----------------------------" +
+            console.log("AEL: execute: +---(evaluation recursion tree)---------" +
                 "----------------------------------------------------------------")
         const evaluator = new AELEval(vars, trace)
         const result = evaluator.eval(ast)
