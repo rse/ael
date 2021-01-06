@@ -10,13 +10,6 @@ Advanced Expression Language (AEL)
 <p/>
 <img src="https://david-dm.org/rse/ael.png" alt=""/>
 
-Installation
-------------
-
-```shell
-$ npm install ael
-```
-
 About
 -----
 
@@ -27,6 +20,24 @@ logical, bitwise, relational, arithmetical, functional, selective and
 literal constructs and hence can express arbitrary complex matchings and
 lookups. The result can be an arbitrary value, but usually is just a
 boolean one.
+
+Installation
+------------
+
+```shell
+$ npm install ael
+```
+
+Usage
+-----
+
+```
+$ cat sample.js
+FIXME
+
+$ node sample.js
+FIXME
+```
 
 Expression Language
 -------------------
@@ -117,17 +128,6 @@ declare module "AEL" {
     }
     export = AEL
 }
-```
-
-Example
--------
-
-```
-$ cat sample.js
-FIXME
-
-$ node sample.js
-FIXME
 ```
 
 Implementation Notice
