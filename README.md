@@ -74,22 +74,6 @@ Application Programming Interface (API)
 - `new AEL(): AEL`:<br/>
   Create a new AEL instance.
 
-- `AEL#version(): { major: Number, minor: Number, micro: Number, date: Number }`:<br/>
-  Return the current AEL library version details.
-
-- `AEL#func(name: String, func: (adapter: Adapter, node: Object, [...]) => Any): AEL`:<br/>
-  Register function named `name` by providing the callback `func` which has
-  to return an arbitrary value and optionally can access the current `node` with
-  the help of the selected `adapter`. Returns the API itself.
-
-        /*  the built-in implementation for "depth"  */
-        ael.func("depth", function (adapter, node) => {
-            var depth = 1
-            while ((node = adapter.getParentNode(node)) !== null)
-                depth++
-            return depth
-        })
-
 - `AEL#cache(num: Number): AEL`:<br/>
   Set the upper limit for the internal query cache to `num`, i.e.,
   up to `num` ASTs of parsed queries will be cached. Set `num` to

@@ -37,15 +37,10 @@ describe("AEL Library", () => {
     const ael = new AEL()
 
     it("API availability", () => {
-        expect(ael).to.respondTo("version")
         expect(ael).to.respondTo("cache")
         expect(ael).to.respondTo("compile")
         expect(ael).to.respondTo("execute")
         expect(ael).to.respondTo("evaluate")
-        expect(ael.version()).to.have.property("major")
-        expect(ael.version()).to.have.property("minor")
-        expect(ael.version()).to.have.property("micro")
-        expect(ael.version()).to.have.property("date")
     })
 
     it("simple expressions", () => {

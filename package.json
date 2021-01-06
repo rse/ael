@@ -44,8 +44,7 @@
         "@babel/preset-env":      "7.12.11",
         "uglifyify":              "5.0.2",
         "browserify-header":      "1.0.1",
-        "browserify-derequire":   "1.0.1",
-        "browserify-replace":     "1.0.1"
+        "browserify-derequire":   "1.0.1"
     },
     "engines": {
         "node":                   ">=10.0.0"

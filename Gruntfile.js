@@ -30,7 +30,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks("grunt-eslint");
 
     grunt.initConfig({
-        version: grunt.file.readYAML("VERSION.yml"),
         eslint: {
             options: {
                 configFile: "eslint.yaml"
@@ -44,12 +43,6 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: [
-                        [ "browserify-replace", { replace: [
-                            { from: /\$major/g, to: "<%= version.major %>" },
-                            { from: /\$minor/g, to: "<%= version.minor %>" },
-                            { from: /\$micro/g, to: "<%= version.micro %>" },
-                            { from: /\$date/g,  to: "<%= version.date  %>" }
-                        ]}],
                         [ "babelify", {
                             presets: [
                                 [ "@babel/preset-env", {
@@ -78,12 +71,6 @@ module.exports = function (grunt) {
                 },
                 options: {
                     transform: [
-                        [ "browserify-replace", { replace: [
-                            { from: /\$major/g, to: "<%= version.major %>" },
-                            { from: /\$minor/g, to: "<%= version.minor %>" },
-                            { from: /\$micro/g, to: "<%= version.micro %>" },
-                            { from: /\$date/g,  to: "<%= version.date  %>" }
-                        ]}],
                         [ "babelify", {
                             presets: [
                                 [ "@babel/preset-env", {

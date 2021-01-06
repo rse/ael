@@ -23,11 +23,10 @@
 */
 
 /*  load external depdendencies  */
-import CacheLRU           from "cache-lru"
+import CacheLRU  from "cache-lru"
 
 /*  load internal dependencies  */
-import AELExpr           from "./ael-expr.js"
-import AELVersion        from "./ael-version.js"
+import AELExpr   from "./ael-expr.js"
 
 /*  define the API class  */
 class AEL {
@@ -35,11 +34,6 @@ class AEL {
     constructor () {
         /*  create LRU cache  */
         this._cache = new CacheLRU()
-    }
-
-    /*  return the version information  */
-    version () {
-        return AELVersion
     }
 
     /*  configure the LRU cache limit  */
