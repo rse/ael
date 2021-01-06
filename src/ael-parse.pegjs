@@ -139,7 +139,9 @@ exprSelectItem
 
 exprOther
     =   exprVariable
-    /   exprLiteral
+    /   exprLiteralArray
+    /   exprLiteralObject
+    /   exprLiteralOther
     /   exprParenthesis
 
 exprVariable "variable"
@@ -147,7 +149,41 @@ exprVariable "variable"
             return ast("Variable").merge(id)
         }
 
-exprLiteral
+exprLiteralArray
+    =   "[" _ "]" {
+            return ast("LiteralArray")
+        }
+    /   "[" _ l:exprLiteralArrayItems _ "]" {
+            return ast("LiteralArray").add(l)
+        }
+
+exprLiteralArrayItems
+    =   f:expr l:(_ "," _ expr)* { /* RECURSION */
+            return unroll(f, l, 3)
+        }
+
+exprLiteralObject
+    =   "{" _ "}" {
+            return ast("LiteralObject")
+        }
+    /   "{" _ l:exprLiteralObjectItems _ "}" {
+            return ast("LiteralObject").add(l)
+        }
+
+exprLiteralObjectItems
+    =   f:exprLiteralObjectItem l:(_ "," _ exprLiteralObjectItem)* {
+            return unroll(f, l, 3)
+        }
+
+exprLiteralObjectItem
+    =   key:(string / id) _ ":" _ e:expr { /* RECURSION */
+            return ast("LiteralObjectItem").add(key, e)
+        }
+    /   "[" _ key:expr _ "]" _ ":" _ e:expr { /* RECURSION */
+            return ast("LiteralObjectItem").add(key, e)
+        }
+
+exprLiteralOther
     =   string
     /   regexp
     /   number

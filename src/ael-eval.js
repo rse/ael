@@ -61,6 +61,9 @@ export default class AELEval extends AELTrace {
             case "FuncCall":           return this.evalFuncCall(N)
             case "Identifier":         return this.evalIdentifier(N)
             case "Variable":           return this.evalVariable(N)
+            case "LiteralArray":       return this.evalLiteralArray(N)
+            case "LiteralObject":      return this.evalLiteralObject(N)
+            case "LiteralObjectItem":  return this.evalLiteralObjectItem(N)
             case "LiteralString":      return this.evalLiteralString(N)
             case "LiteralRegExp":      return this.evalLiteralRegExp(N)
             case "LiteralNumber":      return this.evalLiteralNumber(N)
@@ -135,14 +138,126 @@ export default class AELEval extends AELTrace {
         let v2 = this.eval(N.child(1))
         let result
         switch (N.get("op")) {
-            case "==": result = v1 === v2; break
-            case "!=": result = v1 !== v2; break
-            case "<=": result = util.coerce(v1, "number") <= util.coerce(v2, "number"); break
-            case ">=": result = util.coerce(v1, "number") >= util.coerce(v2, "number"); break
-            case "<":  result = util.coerce(v1, "number") <  util.coerce(v2, "number"); break
-            case ">":  result = util.coerce(v1, "number") >  util.coerce(v2, "number"); break
-            case "=~": result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) !== null; break
-            case "!~": result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) === null; break
+            case "==":
+                switch (util.typePair(v1, v2)) {
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v1.length === v2.length
+                            && v1.filter((x) => !v2.includes(x)).length === 0
+                            && v2.filter((x) => !v1.includes(x)).length === 0
+                        break
+                    default:
+                        result = v1 === v2
+                }
+                break
+            case "!=":
+                switch (util.typePair(v1, v2)) {
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v1.length !== v2.length
+                            || v1.filter((x) => !v2.includes(x)).length > 0
+                            || v2.filter((x) => !v1.includes(x)).length > 0
+                        break
+                    default:
+                        result = v1 !== v2
+                }
+                break
+            case "<=":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any":
+                        result = v1.localeCompare(util.coerce(v2, "string")) <= 0
+                        break
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v1.filter((x) => !v2.includes(x)).length === 0
+                        break
+                    default:
+                        result = util.coerce(v1, "number") <= util.coerce(v2, "number")
+                }
+                break
+            case "<":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any":
+                        result = v1.localeCompare(util.coerce(v2, "string")) < 0
+                        break
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v1.filter((x) => !v2.includes(x)).length === 0
+                            && v2.filter((x) => !v1.includes(x)).length > 0
+                        break
+                    default:
+                        result = util.coerce(v1, "number") < util.coerce(v2, "number")
+                }
+                break
+            case ">=":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any":
+                        result = v1.localeCompare(util.coerce(v2, "string")) >= 0
+                        break
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v2.filter((x) => !v1.includes(x)).length === 0
+                        break
+                    default:
+                        result = util.coerce(v1, "number") >= util.coerce(v2, "number")
+                }
+                break
+            case ">":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any":
+                        result = v1.localeCompare(util.coerce(v2, "string")) > 0
+                        break
+                    case "array:array":
+                    case "array:object":
+                    case "array:scalar":
+                    case "object:array":
+                    case "object:object":
+                    case "object:scalar":
+                        v1 = util.coerce(v1, "array")
+                        v2 = util.coerce(v2, "array")
+                        result = v2.filter((x) => !v1.includes(x)).length === 0
+                            && v1.filter((x) => !v2.includes(x)).length > 0
+                        break
+                    default:
+                        result = util.coerce(v1, "number") > util.coerce(v2, "number")
+                }
+                break
+            case "=~":
+                result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) !== null
+                break
+            case "!~":
+                result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) === null
+                break
         }
         this.traceEnd(N, result)
         return result
@@ -156,14 +271,103 @@ export default class AELEval extends AELTrace {
         let result
         switch (N.get("op")) {
             case "+":
-                if (typeof v1 === "string")
-                    result = v1 + util.coerce(v2, "string")
-                else
-                    result = util.coerce(v1, "number") + util.coerce(v2, "number")
+                switch (util.typePair(v1, v2)) {
+                    case "string:any":
+                        result = v1 + util.coerce(v2, "string")
+                        break
+                    case "array:array":
+                        result = v1.concat(v2)
+                        break
+                    case "array:object":
+                        result = v1.concat(Object.keys(v2).filter((x) => util.truthy(x)))
+                        break
+                    case "array:scalar":
+                        result = v1.concat([ v2 ])
+                        break
+                    case "object:array":
+                        result = { ...v1, ...v2.reduce((obj, key) => { obj[key] = true; return obj }, {}) }
+                        break
+                    case "object:object":
+                        result = { ...v1, ...v2 }
+                        break
+                    case "object:scalar":
+                        result = { ...v1, [util.coerce(v2, "string")]: true }
+                        break
+                    default:
+                        result = util.coerce(v1, "number") + util.coerce(v2, "number")
+                }
                 break
-            case "-":  result = util.coerce(v1, "number") + util.coerce(v2, "number"); break
+            case "-":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any": {
+                        let i = v1.indexOf(v2)
+                        result = i >= 0 ? v1.splice(i, v2.length) : v1
+                        break
+                    }
+                    case "array:array":
+                        result = v1.filter((x) => !v2.includes(x))
+                        break
+                    case "array:object":
+                        result = v1.filter((x) => !util.truthy(v2[x]))
+                        break
+                    case "array:scalar":
+                        result = v1.filter((x) => x !== v2)
+                        break
+                    case "object:array":
+                        result = Object.keys(v1)
+                            .filter((key) => !v2.includes(key))
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    case "object:object":
+                        result = Object.keys(v1)
+                            .filter((key) => !util.truthy(v2[key]))
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    case "object:scalar":
+                        result = Object.keys(v1)
+                            .filter((key) => key !== v2)
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    default:
+                        result = util.coerce(v1, "number") + util.coerce(v2, "number")
+                }
+                break
+            case "/":
+                switch (util.typePair(v1, v2)) {
+                    case "string:any": {
+                        let i = v1.indexOf(v2)
+                        result = i >= 0 ? v2 : ""
+                        break
+                    }
+                    case "array:array":
+                        result = v1.filter((x) => v2.includes(x))
+                        break
+                    case "array:object":
+                        result = v1.filter((x) => util.truthy(v2[x]))
+                        break
+                    case "array:scalar":
+                        result = v1.filter((x) => x === v2)
+                        break
+                    case "object:array":
+                        result = Object.keys(v1)
+                            .filter((key) => v2.includes(key))
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    case "object:object":
+                        result = Object.keys(v1)
+                            .filter((key) => util.truthy(v2[key]))
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    case "object:scalar":
+                        result = Object.keys(v1)
+                            .filter((key) => key === v2)
+                            .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
+                        break
+                    default:
+                        result = util.coerce(v1, "number") / util.coerce(v2, "number")
+                }
+                break
             case "*":  result = util.coerce(v1, "number") * util.coerce(v2, "number"); break
-            case "/":  result = util.coerce(v1, "number") / util.coerce(v2, "number"); break
             case "%":  result = util.coerce(v1, "number") % util.coerce(v2, "number"); break
             case "**": result = Math.pow(util.coerce(v1, "number"), util.coerce(v2, "number")); break
         }
@@ -248,6 +452,38 @@ export default class AELEval extends AELTrace {
         if (typeof this.vars[id] === "undefined")
             throw this.error(N, "evalVariable", "invalid variable reference")
         let result = this.vars[id]
+        this.traceEnd(N, result)
+        return result
+    }
+
+    /*  evaluate array literal  */
+    evalLiteralArray (N) {
+        this.traceBegin(N)
+        let result = []
+        for (const child of N.childs())
+            result.push(this.eval(child))
+        this.traceEnd(N, result)
+        return result
+    }
+
+    /*  evaluate object literal  */
+    evalLiteralObject (N) {
+        this.traceBegin(N)
+        let result = {}
+        for (const child of N.childs()) {
+            const sub = this.eval(child)
+            result = { ...result, ...sub }
+        }
+        this.traceEnd(N, result)
+        return result
+    }
+
+    /*  evaluate object item  */
+    evalLiteralObjectItem (N) {
+        this.traceBegin(N)
+        const key = this.eval(N.child(0))
+        const val = this.eval(N.child(1))
+        const result = { [key]: val }
         this.traceEnd(N, result)
         return result
     }

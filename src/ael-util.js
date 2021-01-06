@@ -54,6 +54,8 @@ export default class AELUtil {
                     result = true
                     if (value instanceof Array)
                         result = value.length > 0
+                    else
+                        result = Object.keys(value).length > 0
                 }
                 break
             default:
@@ -84,6 +86,18 @@ export default class AELUtil {
                         if (!(typeof value === "object" && value instanceof RegExp))
                             value = new RegExp(value)
                         break
+                    case "array":
+                        if (typeof value === "object" && !(value instanceof Array) && value !== null)
+                            value = Object.keys(value)
+                        else if (!(typeof value === "object" && value instanceof Array))
+                            value = [ String(value) ]
+                        break
+                    case "object":
+                        if (typeof value === "object" && value instanceof Array)
+                            value = value.reduce((obj, el) => { obj[el] = true; return obj }, {})
+                        else if (!(typeof value === "object"))
+                            value = { [String(value)]: true }
+                        break
                 }
             }
             catch (e) {
@@ -92,4 +106,31 @@ export default class AELUtil {
         }
         return value
     }
+
+    /*  determine type pair  */
+    static typePair (v1, v2) {
+        if (typeof v1 === "string")
+            return "string:any"
+        else if (typeof v1 === "object" && v1 !== null) {
+            if (v1 instanceof Array) {
+                if (typeof v2 === "object" && v2 instanceof Array && v2 !== null)
+                    return "array:array"
+                else if (typeof v2 === "object" && !(v2 instanceof Array) && v2 !== null)
+                    return "array:object"
+                else
+                    return "array:scalar"
+            }
+            else {
+                if (typeof v2 === "object" && v2 instanceof Array && v2 !== null)
+                    return "object:array"
+                else if (typeof v2 === "object" && !(v2 instanceof Array) && v2 !== null)
+                    return "object:object"
+                else
+                    return "object:scalar"
+            }
+        }
+        else
+            return "any:any"
+    }
 }
+
