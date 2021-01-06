@@ -41,7 +41,7 @@ export default class AELExprTrace {
         if (!this.trace)
             return
         let prefix = this.prefixOf(N)
-        console.log("AEL: execute: begin: | " + prefix + N.type())
+        console.log("AEL: execute: | " + prefix + N.type() + " {")
     }
 
     /*  end tracing step  */
@@ -56,7 +56,7 @@ export default class AELExprTrace {
             result = JSON.stringify(val)
         if (result.length > 40)
             result = result.substr(0, 40) + "..."
-        console.log("AEL: execute: end:   | " + prefix + N.type() + ": " + result)
+        console.log("AEL: execute: | " + prefix + "}: " + result)
     }
 }
 

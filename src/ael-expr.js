@@ -80,7 +80,7 @@ export default class AELExpr {
     execute (params, vars, funcs, trace) {
         if (trace)
             console.log("AEL: execute: +---------------------------------------" +
-                "-----------------------+----------------------------------------")
+                "----------------------------------------------------------------")
         let ael = new AELExprEval(params, vars, funcs, trace)
         return ael.eval(this.ast)
     }
