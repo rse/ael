@@ -23,67 +23,67 @@ About
 Advanced Expression Language (AEL) is a JavaScript library for use
 in the Browser and Node.js to parse/compile and execute/evaluate
 JavaScript-style expressions. The expressions are based on conditional,
-logical, bitwise, relational, arithmetical, functional, selective
-and literal constructs and hence can express arbitrary complex
-matching. The result can be an arbitrary value, but usually is just a
+logical, bitwise, relational, arithmetical, functional, selective and
+literal constructs and hence can express arbitrary complex matchings and
+lookups. The result can be an arbitrary value, but usually is just a
 boolean one.
 
 Expression Language
 -------------------
 
-### By Example
+The following BNF-style grammar shows the supported expression language:
 
-    foo bar quux
+```
+//  top-level
+expr             ::= conditional
+                   | logical
+                   | bitwise
+                   | relational
+                   | arithmentical
+                   | functional
+                   | selective
+                   | variable
+                   | literal
+                   | parenthesis
 
-### By Grammar
+//  expressions
+conditional      ::= expr "?" expr ":" expr
+                   | expr "?:" expr
+logical          ::= expr ("&&" | "||") expr
+                   | "!" expr
+bitwise          ::= expr ("&" | "^" | "|" | "<<" | ">>") expr
+                   | "~" expr
+relational       ::= expr ("==" | "!=" | "<=" | ">=" | "<" | ">" | "=~" | "!~") expr
+arithmethical    ::= expr ("+" | "-" | "*" | "/" | "%" | "**") expr
+functional       ::= expr "?."? "(" (expr ("," expr)*)? ")"
+selective        ::= expr "?."? "." ud
+                   | expr "?."? "[" expr "]"
+variable         ::= id
+literal          ::= array | object | string | regexp | number | value
+parenthesis      ::= "(" expr ")"
 
-    //  top-level
-    expr             ::= conditional
-                       | logical
-                       | bitwise
-                       | relational
-                       | arithmentical
-                       | functional
-                       | selective
-                       | variable
-                       | literal
-                       | parenthesis
-
-    //  expressions
-    conditional      ::= expr "?" expr ":" expr
-                       | expr "?:" expr
-    logical          ::= expr ("&&" | "||") expr
-                       | "!" expr
-    bitwise          ::= expr ("&" | "^" | "|" | "<<" | ">>") expr
-                       | "~" expr
-    relational       ::= expr ("==" | "!=" | "<=" | ">=" | "<" | ">" | "=~" | "!~") expr
-    arithmethical    ::= expr ("+" | "-" | "*" | "/" | "%" | "**") expr
-    functional       ::= expr "?."? "(" (expr ("," expr)*)? ")"
-    selective        ::= expr "?."? "." ud
-                       | expr "?."? "[" expr "]"
-    variable         ::= id
-    literal          ::= array | object | string | regexp | number | value
-    parenthesis      ::= "(" expr ")"
-
-    //  literals
-    id               ::= /[a-zA-Z_][a-zA-Z0-9_-]*/
-    array            ::= "[" (expr ("," expr)*)? "]"
-    object           ::= "{" (key ":" expr ("," key ":" expr)*)? "}"
-    key              ::= "[" expr "]"
-                       | id
-    string           ::= /"(\\"|.)*"/
-                       | /'(\\'|.)*'/
-    regexp           ::= /`(\\`|.)*`/
-    number           ::= /[+-]?/ number-value
-    number-value     ::= "0b" /[01]+/
-                       | "0o" /[0-7]+/
-                       | "0x" /[0-9a-fA-F]+/
-                       | /[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?/
-                       | /[0-9]+/
-    value            ::= "true" | "false" | "null" | "NaN" | "undefined"
+//  literals
+id               ::= /[a-zA-Z_][a-zA-Z0-9_-]*/
+array            ::= "[" (expr ("," expr)*)? "]"
+object           ::= "{" (key ":" expr ("," key ":" expr)*)? "}"
+key              ::= "[" expr "]"
+                   | id
+string           ::= /"(\\"|.)*"/
+                   | /'(\\'|.)*'/
+regexp           ::= /`(\\`|.)*`/
+number           ::= /[+-]?/ number-value
+number-value     ::= "0b" /[01]+/
+                   | "0o" /[0-7]+/
+                   | "0x" /[0-9a-fA-F]+/
+                   | /[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?/
+                   | /[0-9]+/
+value            ::= "true" | "false" | "null" | "NaN" | "undefined"
+```
 
 Application Programming Interface (API)
 ---------------------------------------
+
+The following TypeScript definition shows the supported Application Programming Interface (API):
 
 ```ts
 declare module "AEL" {
