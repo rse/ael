@@ -35,13 +35,11 @@ const AEL = require("../lib/ael.node.js")
 
 describe("AEL Library", () => {
     const ael = new AEL()
-
     it("API availability", () => {
         expect(ael).to.respondTo("compile")
         expect(ael).to.respondTo("execute")
         expect(ael).to.respondTo("evaluate")
     })
-
     it("simple expressions", () => {
         expect(ael.evaluate("true")).to.be.equal(true)
         expect(ael.evaluate("42")).to.be.equal(42)
