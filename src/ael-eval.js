@@ -328,7 +328,7 @@ export default class AELEval extends AELTrace {
                             .reduce((obj, key) => { obj[key] = v1[key]; return obj }, {})
                         break
                     default:
-                        result = util.coerce(v1, "number") + util.coerce(v2, "number")
+                        result = util.coerce(v1, "number") - util.coerce(v2, "number")
                 }
                 break
             case "/":
