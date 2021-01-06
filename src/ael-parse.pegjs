@@ -41,70 +41,70 @@ expr
     =   exprConditional
 
 exprConditional
-    =   e1:exprLogicalOr _ "?:" _ e2:exprConditional {
+    =   e1:exprLogicalOr _ "?:" _ e2:expr {
             return ast("ConditionalBinary").add(e1, e2)
         }
-    /   e1:exprLogicalOr _ "?" _ e2:exprConditional _ ":" _ e3:exprConditional {
+    /   e1:exprLogicalOr _ "?" _ e2:expr _ ":" _ e3:expr {
             return ast("ConditionalTernary").add(e1, e2, e3)
         }
     /   exprLogicalOr
 
 exprLogicalOr
-    =   e1:exprLogicalAnd _ op:$("||") _ e2:exprLogicalOr {
+    =   e1:exprLogicalAnd _ op:$("||") _ e2:expr {
             return ast("Logical").set({ op: op }).add(e1, e2)
         }
     /   exprLogicalAnd
 
 exprLogicalAnd
-    =   e1:exprBitwiseOr _ op:$("&&") _ e2:exprLogicalAnd {
+    =   e1:exprBitwiseOr _ op:$("&&") _ e2:expr {
             return ast("Logical").set({ op: op }).add(e1, e2)
         }
     /   exprBitwiseOr
 
 exprBitwiseOr
-    =   e1:exprBitwiseXOr _ op:$("|") _ e2:exprBitwiseOr {
+    =   e1:exprBitwiseXOr _ op:$("|") _ e2:expr {
             return ast("Bitwise").set({ op: op }).add(e1, e2)
         }
     /   exprBitwiseXOr
 
 exprBitwiseXOr
-    =   e1:exprBitwiseAnd _ op:$("^") _ e2:exprBitwiseXOr {
+    =   e1:exprBitwiseAnd _ op:$("^") _ e2:expr {
             return ast("Bitwise").set({ op: op }).add(e1, e2)
         }
     /   exprBitwiseAnd
 
 exprBitwiseAnd
-    =   e1:exprRelational _ op:$("&") _ e2:exprBitwiseAnd {
+    =   e1:exprRelational _ op:$("&") _ e2:expr {
             return ast("Bitwise").set({ op: op }).add(e1, e2)
         }
     /   exprRelational
 
 exprRelational
-    =   e1:exprBitwiseShift _ op:$("==" / "!=" / "<=" / ">=" / "<" / ">" / "=~" / "!~") _ e2:exprRelational {
+    =   e1:exprBitwiseShift _ op:$("==" / "!=" / "<=" / ">=" / "<" / ">" / "=~" / "!~") _ e2:expr {
             return ast("Relational").set({ op: op }).add(e1, e2)
         }
     /   exprBitwiseShift
 
 exprBitwiseShift
-    =   e1:exprAdditive _ op:$("<<" / ">>") _ e2:exprBitwiseShift {
+    =   e1:exprAdditive _ op:$("<<" / ">>") _ e2:expr {
             return ast("Bitwise").set({ op: op }).add(e1, e2)
         }
     /   exprAdditive
 
 exprAdditive
-    =   e1:exprMultiplicative _ op:$("+" / "-") _ e2:exprAdditive {
+    =   e1:exprMultiplicative _ op:$("+" / "-") _ e2:expr {
             return ast("Arithmetical").set({ op: op }).add(e1, e2)
         }
     /   exprMultiplicative
 
 exprMultiplicative
-    =   e1:exprUnary _ op:$("**" / "*" / "/" / "%") _ e2:exprMultiplicative {
+    =   e1:exprUnary _ op:$("**" / "*" / "/" / "%") _ e2:expr {
             return ast("Arithmetical").set({ op: op }).add(e1, e2)
         }
     /   exprUnary
 
 exprUnary
-    =   op:$("!" / "~") e:exprUnary {
+    =   op:$("!" / "~") e:expr {
             return ast("Unary").set({ op: op }).add(e)
         }
     /   exprFunctionCall
