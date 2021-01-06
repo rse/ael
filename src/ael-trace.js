@@ -22,11 +22,15 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* eslint no-console: 0 */
-
+/*  load internal depdendencies  */
 import util from "./ael-util.js"
 
+/*  the exported class  */
 export default class AELTrace {
+    constructor (trace = null) {
+        this.trace = trace
+    }
+
     /*  determine output prefix based on tree depth  */
     prefixOf (N) {
         let depth = 0
@@ -38,15 +42,15 @@ export default class AELTrace {
 
     /*  begin tracing step  */
     traceBegin (N) {
-        if (!this.trace)
+        if (this.trace === null)
             return
         let prefix = this.prefixOf(N)
-        console.log("AEL: execute: | " + prefix + N.type() + " {")
+        this.trace("AEL: execute: | " + prefix + N.type() + " {")
     }
 
     /*  end tracing step  */
     traceEnd (N, val) {
-        if (!this.trace)
+        if (this.trace === null)
             return
         let prefix = this.prefixOf(N)
         let result
@@ -58,7 +62,7 @@ export default class AELTrace {
             result = JSON.stringify(val)
         if (result.length > 40)
             result = result.substr(0, 40) + "..."
-        console.log("AEL: execute: | " + prefix + "}: " + result)
+        this.trace("AEL: execute: | " + prefix + "}: " + result)
     }
 }
 

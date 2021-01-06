@@ -25,31 +25,30 @@
 declare module "AEL" {
     class AEL {
         /*  create AEL instance  */
-        public constructor()
-
-        /*  set AST cache size  */
-        public cache (
-            entries: number          /*  number of AST cache entries  */
-        ): AEL
+        public constructor(
+            options?: {
+                cache?:    number,   /*  number of LRU-cached ASTs (default: 0)  */
+                trace?: (            /*  optional tracing callback (default: null)  */
+                    msg: string      /*  tracing message  */
+                ) => void
+            }
+        )
 
         /*  individual step 1: compile (and cache) expression into AST  */
         compile(
-            expr:          string,   /*  expression string  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            expr:          string    /*  expression string  */
         ): any                       /*  abstract syntax tree  */
 
         /*  individual step 2: execute AST  */
         execute(
             ast:           any,      /*  abstract syntax tree  */
-            vars:          object,   /*  expression variables  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            vars:          object    /*  expression variables  */
         ): void
 
         /*  all-in-one step: evaluate (compile and execute) expression  */
         evaluate(
             expr:          string,   /*  expression string  */
-            vars:          object,   /*  expression variables  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            vars:          object    /*  expression variables  */
         ): any
     }
     export = AEL

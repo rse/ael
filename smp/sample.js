@@ -2,9 +2,8 @@
 const AEL = require("..")
 
 try {
-    let ael = new AEL()
-    let ast = ael.compile(`foo.bar?.quux?.()`, true)
-    let result = ael.execute(ast, { foo: { bar: { quux: () => 42 } } }, true)
+    let result = new AEL({ trace: (msg) => console.log(msg) })
+        .evaluate(`foo.bar?.quux?.()`, { foo: { bar: { quux: () => 42 } } }, true)
     console.log(result)
 }
 catch (ex) {

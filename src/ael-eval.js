@@ -30,10 +30,9 @@ import AELError        from "./ael-error.js"
 /*  the exported class  */
 export default class AELEval extends AELTrace {
     constructor (expr, vars, trace) {
-        super()
-        this.expr  = expr
-        this.vars  = vars
-        this.trace = trace
+        super(trace)
+        this.expr = expr
+        this.vars = vars
     }
 
     /*  raise an error  */

@@ -42,34 +42,30 @@ const AELParser = PEG.generateFromFile(
 /*  define the API class  */
 class AEL {
     /*  create a new AEL instance  */
-    constructor () {
+    constructor (options = {}) {
+        /*  provide parameter defaults  */
+        this.options = {
+            cache: 100,
+            trace: null,
+            ...options
+        }
+
         /*  create LRU cache  */
         this._cache = new CacheLRU()
-    }
-
-    /*  configure the LRU cache limit  */
-    cache (entries) {
-        if (arguments.length !== 1)
-            throw new Error("AEL#cache: invalid number of arguments")
-        this._cache.limit(entries)
-        return this
+        this._cache.limit(this.options.cache)
     }
 
     /*  individual step 1: compile expression into AST  */
-    compile (expr, trace) {
+    compile (expr) {
         /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#compile: too less arguments")
         if (arguments.length > 2)
             throw new Error("AEL#compile: too many arguments")
 
-        /*  provide defaults  */
-        if (trace === undefined)
-            trace = false
-
         /*  tracing operation  */
-        if (trace)
-            console.log("AEL: compile: +---(expression string)-----------------" +
+        if (this.options.trace !== null)
+            this.options.trace("AEL: compile: +---(expression string)-----------------" +
                 "----------------------------------------------------------------\n" +
                 expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
 
@@ -103,8 +99,8 @@ class AEL {
         }
 
         /*  tracing operation  */
-        if (trace)
-            console.log("AEL: compile: +---(abstract syntax tree)--------------" +
+        if (this.options.trace !== null)
+            this.options.trace("AEL: compile: +---(abstract syntax tree)--------------" +
                 "----------------------------------------------------------------\n" +
                 ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
 
@@ -112,7 +108,7 @@ class AEL {
     }
 
     /*  individual step 2: execute AST  */
-    execute (ast, vars, trace) {
+    execute (ast, vars) {
         /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#execute: too less arguments")
@@ -122,22 +118,20 @@ class AEL {
         /*  provide defaults  */
         if (vars === undefined)
             vars = {}
-        if (trace === undefined)
-            trace = false
 
         /*  tracing operation  */
-        if (trace)
-            console.log("AEL: execute: +---(evaluation recursion tree)---------" +
+        if (this.options.trace !== null)
+            this.options.trace("AEL: execute: +---(evaluation recursion tree)---------" +
                 "----------------------------------------------------------------")
 
         /*  evaluate the AST  */
         const expr = ast.get("expr")
-        const evaluator = new AELEval(expr, vars, trace)
+        const evaluator = new AELEval(expr, vars, this.options.trace)
         return evaluator.eval(ast)
     }
 
     /*  all-in-one step  */
-    evaluate (expr, vars, trace) {
+    evaluate (expr, vars) {
         /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#evaluate: too less arguments")
@@ -147,12 +141,10 @@ class AEL {
         /*  provide defaults  */
         if (vars === undefined)
             vars = {}
-        if (trace === undefined)
-            trace = false
 
         /*  compile and evaluate expression  */
-        const ast = this.compile(expr, trace)
-        return this.execute(ast, vars, trace)
+        const ast = this.compile(expr)
+        return this.execute(ast, vars)
     }
 }
 
