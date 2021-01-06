@@ -20,16 +20,19 @@ $ npm install ael
 About
 -----
 
-Advanced Expression Language (AEL) is a library in JavaScript for use
-in the Browser and Node.js to parse and evaluate JavaScript-style
-expressions.
+Advanced Expression Language (AEL) is a JavaScript library for use
+in the Browser and Node.js to parse/compile and execute/evaluate
+JavaScript-style expressions. The expressions are based on conditional,
+logical, bitwise, relational, arithmetical, functional, literal and
+value constructs and hence can express arbitrary complex matching. The
+result can be an arbitrary value, but usually is just a boolean one.
 
 Expression Language
 -------------------
 
 ### By Example
 
-FIXME
+    foo bar quux
 
 ### By Grammar
 
