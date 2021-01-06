@@ -22,9 +22,11 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
+/*  load internal depdendencies  */
 import util     from "./ael-util.js"
 import AELTrace from "./ael-trace.js"
 
+/*  the exported class  */
 export default class AELEval extends AELTrace {
     constructor (vars, trace) {
         super()
@@ -32,6 +34,7 @@ export default class AELEval extends AELTrace {
         this.trace = trace
     }
 
+    /*  evaluate an arbitrary node  */
     eval (N) {
         switch (N.type()) {
             case "ConditionalBinary":  return this.evalConditionalBinary(N)
@@ -50,10 +53,11 @@ export default class AELEval extends AELTrace {
             case "LiteralNumber":      return this.evalLiteralNumber(N)
             case "LiteralValue":       return this.evalLiteralValue(N)
             default:
-                throw new Error("invalid AST node")
+                throw new Error("invalid AST node (should not happen)")
         }
     }
 
+    /*  evaluate conditional binary operator  */
     evalConditionalBinary (N) {
         this.traceBegin(N)
         let result = this.eval(N.child(0))
@@ -63,6 +67,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate conditional ternary operator  */
     evalConditionalTernary (N) {
         this.traceBegin(N)
         let result = this.eval(N.child(0))
@@ -74,6 +79,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate logical operator  */
     evalLogical (N) {
         this.traceBegin(N)
         let result = false
@@ -93,6 +99,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate bitwise operator  */
     evalBitwise (N) {
         this.traceBegin(N)
         let v1 = util.coerce(this.eval(N.child(0)), "number")
@@ -108,6 +115,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate relational operator  */
     evalRelational (N) {
         this.traceBegin(N)
         let v1 = this.eval(N.child(0))
@@ -127,6 +135,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate arithmetical operator  */
     evalArithmetical (N) {
         this.traceBegin(N)
         let v1 = this.eval(N.child(0))
@@ -149,6 +158,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate unary operator  */
     evalUnary (N) {
         this.traceBegin(N)
         let v = this.eval(N.child(0))
@@ -161,6 +171,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate selection operator  */
     evalSelect (N, provideParent = false) {
         this.traceBegin(N)
         let parent
@@ -177,6 +188,7 @@ export default class AELEval extends AELTrace {
         return provideParent ? [ parent, result ] : result
     }
 
+    /*  evaluate function call  */
     evalFuncCall (N) {
         this.traceBegin(N)
         let S = N.child(0)
@@ -197,6 +209,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate identifier  */
     evalIdentifier (N) {
         this.traceBegin(N)
         let result = N.get("id")
@@ -204,6 +217,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate variable  */
     evalVariable (N) {
         this.traceBegin(N)
         let id = N.get("id")
@@ -214,6 +228,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate string literal  */
     evalLiteralString (N) {
         this.traceBegin(N)
         let result = N.get("value")
@@ -221,6 +236,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate regular expression literal  */
     evalLiteralRegExp (N) {
         this.traceBegin(N)
         let result = N.get("value")
@@ -228,6 +244,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate number literal  */
     evalLiteralNumber (N) {
         this.traceBegin(N)
         let result = N.get("value")
@@ -235,6 +252,7 @@ export default class AELEval extends AELTrace {
         return result
     }
 
+    /*  evaluate special value literal  */
     evalLiteralValue (N) {
         this.traceBegin(N)
         let result = N.get("value")
