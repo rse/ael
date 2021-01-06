@@ -184,15 +184,20 @@ export default class AELEval extends AELTrace {
         return result
     }
 
-    /*  evaluate selection operator  */
+    /*  evaluate selection  */
     evalSelect (N, provideParent = false) {
         this.traceBegin(N)
         let parent
         let result = this.eval(N.child(0))
         for (const child of N.childs(1)) {
-            if (typeof result !== "object")
-                throw this.error(child, "evalSelect", "selector base object does not evaluate into an object")
-            const selector = this.eval(child)
+            const optional = child.get("optional") ?? false
+            if ((result === null || result === undefined) && optional) {
+                result = undefined
+                break
+            }
+            if (result === null || typeof result !== "object")
+                throw this.error(child, "evalSelect", "selector base object does not evaluate into a non-null object")
+            const selector = this.eval(child.child(0))
             const key = util.coerce(selector, "string")
             parent = result
             result = result[key]
@@ -211,13 +216,19 @@ export default class AELEval extends AELTrace {
             [ ctx, fn ] = this.evalSelect(S, true)
         else
             fn = this.eval(S)
-        if (typeof fn !== "function")
-            throw this.error(S, "evalFuncCall", "object does not evaluate into a function")
-        let args = []
-        N.childs().forEach((child) => {
-            args.push(this.eval(child))
-        })
-        let result = fn.apply(ctx, args)
+        const optional = N.get("optional") ?? false
+        let result
+        if ((fn === null || fn === undefined) && optional)
+            result = undefined
+        else {
+            if (typeof fn !== "function")
+                throw this.error(S, "evalFuncCall", "object does not evaluate into a function")
+            let args = []
+            N.childs().forEach((child) => {
+                args.push(this.eval(child))
+            })
+            result = fn.apply(ctx, args)
+        }
         this.traceEnd(N, result)
         return result
     }

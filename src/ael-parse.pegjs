@@ -110,8 +110,8 @@ exprUnary
     /   exprFunctionCall
 
 exprFunctionCall
-    =   e:exprSelect _ "(" _ p:exprFunctionCallParams? _ ")" {
-            return ast("FuncCall").add(e, p)
+    =   e:exprSelect _ oc:"?."? _ "(" _ p:exprFunctionCallParams? _ ")" {
+            return ast("FuncCall").set(oc ? { optional: true } : {}).add(e, p)
         }
     /   exprSelect
 
@@ -127,11 +127,14 @@ exprSelect
     /   exprOther
 
 exprSelectItem
-    =   _ "[" _ e:expr _ "]" { /* RECURSION */
-            return e
+    =   _ oc:"?."? _ "[" _ e:expr _ "]" { /* RECURSION */
+            return ast("SelectItem").set(oc ? { optional: true } : {}).add(e)
+        }
+    /   _ "?." _ id:id {
+            return ast("SelectItem").set({ optional: true }).add(id)
         }
     /   _ "." _ id:id {
-            return id
+            return ast("SelectItem").add(id)
         }
 
 exprOther
