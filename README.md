@@ -69,35 +69,40 @@ FIXME
 Application Programming Interface (API)
 ---------------------------------------
 
-### AEL API
+```ts
+declare module "AEL" {
+    class AEL {
+        /*  create AEL instance  */
+        public constructor()
 
-- `new AEL(): AEL`:<br/>
-  Create a new AEL instance.
+        /*  set AST cache size  */
+        public cache (
+            entries: number          /*  number of AST cache entries  */
+        ): AEL
 
-- `AEL#cache(num: Number): AEL`:<br/>
-  Set the upper limit for the internal query cache to `num`, i.e.,
-  up to `num` ASTs of parsed queries will be cached. Set `num` to
-  `0` to disable the cache at all. Returns the API itself.
+        /*  individual step 1: compile (and cache) expression into AST  */
+        compile(
+            expr:          string,   /*  expression string  */
+            trace?:        boolean   /*  whether to output trace information (default: false)  */
+        ): any                       /*  abstract syntax tree  */
 
-- `AEL#compile(selector: String, trace?: Boolean): AELQuery {
-  Compile `selector` DSL into an internal query object for subsequent
-  processing by `AEL#execute`.
-  If `trace` is `true` the compiling is dumped to the console.
-  Returns the query object.
+        /*  individual step 2: execute AST  */
+        execute(
+            ast:           any,      /*  abstract syntax tree  */
+            vars:          object,   /*  expression variables  */
+            trace?:        boolean   /*  whether to output trace information (default: false)  */
+        ): void
 
-- `AEL#execute(node: Object, query: AELQuery, params?: Object, trace?: Boolean): Object[]`:<br/>
-  Execute the previously compiled `query` (see `compile` above) at `node`.
-  The optional `params` object can provide parameters for the `{name}` query constructs.
-  If `trace` is `true` the execution is dumped to the console.
-  Returns an array of zero or more matching AST nodes.
-
-- `AEL#evaluate(node: Object, selector: String, params?: Object, trace?: Boolean): Object[]`: <br/>
-  Just the convenient combination of `compile` and `execute`:
-  `execute(node, compile(selector, trace), params, trace)`.
-  Use this as the standard query method except you need more control.
-  The optional `params` object can provide parameters for the `{name}` query constructs.
-  If `trace` is `true` the compiling and execution is dumped to the console.
-  Returns an array of zero or more matching AST nodes.
+        /*  all-in-one step: evaluate (compile and execute) expression  */
+        evaluate(
+            expr:          string,   /*  expression string  */
+            vars:          object,   /*  expression variables  */
+            trace?:        boolean   /*  whether to output trace information (default: false)  */
+        ): any
+    }
+    export = AEL
+}
+```
 
 Example
 -------
