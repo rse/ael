@@ -102,8 +102,7 @@ class AEL {
             console.log("AEL: execute: +---(evaluation recursion tree)---------" +
                 "----------------------------------------------------------------")
         const evaluator = new AELEval(vars, trace)
-        const result = evaluator.eval(ast)
-        return result
+        return evaluator.eval(ast)
     }
 
     /*  all-in-one step  */
