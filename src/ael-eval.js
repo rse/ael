@@ -23,15 +23,28 @@
 */
 
 /*  load internal depdendencies  */
-import util     from "./ael-util.js"
-import AELTrace from "./ael-trace.js"
+import util            from "./ael-util.js"
+import AELTrace        from "./ael-trace.js"
+import AELError        from "./ael-error.js"
 
 /*  the exported class  */
 export default class AELEval extends AELTrace {
-    constructor (vars, trace) {
+    constructor (expr, vars, trace) {
         super()
+        this.expr  = expr
         this.vars  = vars
         this.trace = trace
+    }
+
+    /*  raise an error  */
+    error (N, origin, message) {
+        let pos = N.pos()
+        return new AELError(message, {
+            origin: origin,
+            code:   this.expr,
+            line:   pos.line,
+            column: pos.column
+        })
     }
 
     /*  evaluate an arbitrary node  */
@@ -53,7 +66,7 @@ export default class AELEval extends AELTrace {
             case "LiteralNumber":      return this.evalLiteralNumber(N)
             case "LiteralValue":       return this.evalLiteralValue(N)
             default:
-                throw new Error("invalid AST node (should not happen)")
+                throw this.error(N, "eval", "invalid AST node (should not happen)")
         }
     }
 
@@ -178,7 +191,7 @@ export default class AELEval extends AELTrace {
         let result = this.eval(N.child(0))
         for (const child of N.childs(1)) {
             if (typeof result !== "object")
-                throw new Error("selector base object does not evaluate into an object")
+                throw this.error(child, "evalSelect", "selector base object does not evaluate into an object")
             const selector = this.eval(child)
             const key = util.coerce(selector, "string")
             parent = result
@@ -199,7 +212,7 @@ export default class AELEval extends AELTrace {
         else
             fn = this.eval(S)
         if (typeof fn !== "function")
-            throw new Error("object does not evaluate into a function")
+            throw this.error(S, "evalFuncCall", "object does not evaluate into a function")
         let args = []
         N.childs().forEach((child) => {
             args.push(this.eval(child))
@@ -222,7 +235,7 @@ export default class AELEval extends AELTrace {
         this.traceBegin(N)
         let id = N.get("id")
         if (typeof this.vars[id] === "undefined")
-            throw new Error("invalid variable reference \"" + id + "\"")
+            throw this.error(N, "evalVariable", "invalid variable reference")
         let result = this.vars[id]
         this.traceEnd(N, result)
         return result

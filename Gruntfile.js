@@ -89,7 +89,8 @@ module.exports = function (grunt) {
                         "pegjs-otf",
                         "pegjs-util",
                         "asty",
-                        "cache-lru"
+                        "cache-lru",
+                        "source-code-error"
                     ],
                     browserifyOptions: {
                         standalone: "AEL",

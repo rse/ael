@@ -29,6 +29,7 @@ import PEGUtil     from "pegjs-util"
 
 /*  get expression evaluator  */
 import AELEval     from "./ael-eval.js"
+import AELError    from "./ael-error.js"
 
 /*  get expression parser (by loading and on-the-fly compiling PEG.js grammar)  */
 const PEG = require("pegjs-otf")
@@ -56,18 +57,26 @@ class AEL {
 
     /*  individual step 1: compile expression into AST  */
     compile (expr, trace) {
+        /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#compile: too less arguments")
         if (arguments.length > 2)
             throw new Error("AEL#compile: too many arguments")
+
+        /*  provide defaults  */
         if (trace === undefined)
             trace = false
+
+        /*  tracing operation  */
+        if (trace)
+            console.log("AEL: compile: +---(expression string)-----------------" +
+                "----------------------------------------------------------------\n" +
+                expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+
+        /*  try to fetch pre-compiled AST  */
         let ast = this._cache.get(expr)
         if (ast === undefined) {
-            if (trace)
-                console.log("AEL: compile: +---(expression string)-----------------" +
-                    "----------------------------------------------------------------\n" +
-                    expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+            /*  compile AST from scratch  */
             const asty = new ASTY()
             let result = PEGUtil.parse(AELParser, expr, {
                 startRule: "expression",
@@ -75,46 +84,73 @@ class AEL {
                     return asty.create.apply(asty, args).pos(line, column, offset)
                 }
             })
-            if (result.error !== null)
-                throw new Error("AEL: compile: expression parsing failed:\n" +
-                    PEGUtil.errorMessage(result.error, true).replace(/^/mg, "ERROR: "))
+            if (result.error !== null) {
+                const message = "parsing failed: " +
+                    `"${result.error.location.prolog}" "${result.error.location.token}" "${result.error.location.epilog}": ` +
+                    result.error.message
+                throw new AELError(message, {
+                    origin: "parser",
+                    code:   expr,
+                    line:   result.error.line,
+                    column: result.error.column
+                })
+            }
             ast = result.ast
-            if (trace)
-                console.log("AEL: compile: +---(abstract syntax tree)--------------" +
-                    "----------------------------------------------------------------\n" +
-                    ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+            ast.set("expr", expr)
+
+            /*  cache AST for subsequent usages  */
             this._cache.set(expr, ast)
         }
+
+        /*  tracing operation  */
+        if (trace)
+            console.log("AEL: compile: +---(abstract syntax tree)--------------" +
+                "----------------------------------------------------------------\n" +
+                ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+
         return ast
     }
 
     /*  individual step 2: execute AST  */
     execute (ast, vars, trace) {
+        /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#execute: too less arguments")
         if (arguments.length > 3)
             throw new Error("AEL#execute: too many arguments")
+
+        /*  provide defaults  */
         if (vars === undefined)
             vars = {}
         if (trace === undefined)
             trace = false
+
+        /*  tracing operation  */
         if (trace)
             console.log("AEL: execute: +---(evaluation recursion tree)---------" +
                 "----------------------------------------------------------------")
-        const evaluator = new AELEval(vars, trace)
+
+        /*  evaluate the AST  */
+        const expr = ast.get("expr")
+        const evaluator = new AELEval(expr, vars, trace)
         return evaluator.eval(ast)
     }
 
     /*  all-in-one step  */
     evaluate (expr, vars, trace) {
+        /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#evaluate: too less arguments")
         if (arguments.length > 3)
             throw new Error("AEL#evaluate: too many arguments")
+
+        /*  provide defaults  */
         if (vars === undefined)
             vars = {}
         if (trace === undefined)
             trace = false
+
+        /*  compile and evaluate expression  */
         const ast = this.compile(expr, trace)
         return this.execute(ast, vars, trace)
     }
