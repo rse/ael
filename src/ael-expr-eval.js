@@ -26,12 +26,10 @@ import util         from "./ael-util.js"
 import AELExprTrace from "./ael-expr-trace.js"
 
 export default class AELExprEval extends AELExprTrace {
-    constructor (params, vars, funcs, trace) {
+    constructor (vars, trace) {
         super()
-        this.params  = params
-        this.vars    = vars
-        this.funcs   = funcs
-        this.trace   = trace
+        this.vars  = vars
+        this.trace = trace
     }
 
     eval (N) {
@@ -47,7 +45,6 @@ export default class AELExprEval extends AELExprTrace {
             case "FuncCall":           return this.evalFuncCall(N)
             case "Identifier":         return this.evalIdentifier(N)
             case "Variable":           return this.evalVariable(N)
-            case "Param":              return this.evalParam(N)
             case "LiteralString":      return this.evalLiteralString(N)
             case "LiteralRegExp":      return this.evalLiteralRegExp(N)
             case "LiteralNumber":      return this.evalLiteralNumber(N)
@@ -180,12 +177,33 @@ export default class AELExprEval extends AELExprTrace {
 
     evalFuncCall (N) {
         this.traceBegin(N)
-        let id = N.get("id")
+        let S = N.child(0)
+
+        this.traceBegin(S)
+        let ctx = null
+        let fn  = null
+        if (S.type() === "Variable")
+            fn = this.eval(S)
+        else if (S.type() === "Select") {
+            fn = this.eval(S.child(0))
+            for (const child of S.childs(1)) {
+                if (typeof fn !== "object")
+                    throw new Error("selector base object does not evaluate into an object")
+                const selector = this.eval(child)
+                const key = util.coerce(selector, "string")
+                ctx = fn
+                fn = fn[key]
+            }
+        }
+        this.traceEnd(S, fn)
+        if (typeof fn !== "function")
+            throw new Error("selector tail object does not evaluate into a function")
+
         let args = []
         N.childs().forEach((child) => {
             args.push(this.eval(child))
         })
-        let result = this.funcs.run(id, args)
+        let result = fn.apply(ctx, args)
         this.traceEnd(N, result)
         return result
     }
@@ -203,16 +221,6 @@ export default class AELExprEval extends AELExprTrace {
         if (typeof this.vars[id] === "undefined")
             throw new Error("invalid variable reference \"" + id + "\"")
         let result = this.vars[id]
-        this.traceEnd(N, result)
-        return result
-    }
-
-    evalParam (N) {
-        this.traceBegin(N)
-        let num = N.get("value")
-        if (typeof this.params[num] === "undefined")
-            throw new Error("invalid parameter reference \"$" + num + "\"")
-        let result = this.params[num]
         this.traceEnd(N, result)
         return result
     }

@@ -38,7 +38,6 @@ describe("AEL Library", () => {
 
     it("API availability", () => {
         expect(ael).to.respondTo("version")
-        expect(ael).to.respondTo("func")
         expect(ael).to.respondTo("cache")
         expect(ael).to.respondTo("compile")
         expect(ael).to.respondTo("execute")
@@ -49,18 +48,16 @@ describe("AEL Library", () => {
         expect(ael.version()).to.have.property("date")
     })
 
-    ael.func("add", (a, b) => { return a + b })
-
     it("simple expressions", () => {
         expect(ael.evaluate("true")).to.be.equal(true)
         expect(ael.evaluate("42")).to.be.equal(42)
         expect(ael.evaluate("42 + 7")).to.be.equal(49)
     })
-    it("parameter expressions", () => {
-        expect(ael.evaluate("$1", [ 1, 2, 3 ])).to.be.equal(2)
-    })
     it("variable expressions", () => {
-        expect(ael.evaluate("foo + bar", [], { foo: "foo", bar: "bar" })).to.be.equal("foobar")
+        expect(ael.evaluate("foo + bar", { foo: "foo", bar: "bar" })).to.be.equal("foobar")
+    })
+    it("function calls", () => {
+        expect(ael.evaluate("foo() + bar.baz()", { foo: () => 42, bar: { baz: () => 7 } }), true).to.be.equal(49)
     })
 })
 

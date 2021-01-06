@@ -52,6 +52,8 @@ export default class AELExprTrace {
         let result
         if (val === undefined)
             result = "undefined"
+        else if (typeof val === "function")
+            result = `[Function: ${val.name}]`
         else
             result = JSON.stringify(val)
         if (result.length > 40)

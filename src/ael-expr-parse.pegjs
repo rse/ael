@@ -107,7 +107,18 @@ exprUnary
     =   op:$("!" / "~") e:exprUnary {
             return ast("Unary").set({ op: op }).add(e)
         }
+    /   exprFunctionCall
+
+exprFunctionCall
+    =   e:exprSelect _ "(" _ p:exprFunctionCallParams? _ ")" {
+            return ast("FuncCall").add(e, p)
+        }
     /   exprSelect
+
+exprFunctionCallParams
+    =   f:expr l:(_ "," _ expr)* { /* RECURSION */
+            return unroll(f, l, 3)
+        }
 
 exprSelect
     =   e1:exprOther e2:exprSelectItem+ {
@@ -124,30 +135,13 @@ exprSelectItem
         }
 
 exprOther
-    =   exprFunctionCall
-    /   exprVariable
-    /   exprParam
+    =   exprVariable
     /   exprLiteral
     /   exprParenthesis
-
-exprFunctionCall
-    =   id:id _ "(" _ p:exprFunctionCallParams? _ ")" {
-            return ast("FuncCall").merge(id).add(p)
-        }
-
-exprFunctionCallParams
-    =   f:expr l:(_ "," _ expr)* { /* RECURSION */
-            return unroll(f, l, 3)
-        }
 
 exprVariable "variable"
     =   id:id {
             return ast("Variable").merge(id)
-        }
-
-exprParam "numeric parameter reference"
-    =   "$" n:number {
-            return ast("Param").merge(n)
         }
 
 exprLiteral

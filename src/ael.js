@@ -26,8 +26,6 @@
 import CacheLRU           from "cache-lru"
 
 /*  load internal dependencies  */
-import AELFuncs          from "./ael-funcs.js"
-import AELFuncsSTD       from "./ael-funcs-std.js"
 import AELExpr           from "./ael-expr.js"
 import AELVersion        from "./ael-version.js"
 
@@ -35,11 +33,6 @@ import AELVersion        from "./ael-version.js"
 class AEL {
     /*  create a new AEL instance  */
     constructor () {
-        /*  create function registry and pre-register standard functions  */
-        this._funcs = new AELFuncs()
-        for (let name in AELFuncsSTD)
-            this.func(name, AELFuncsSTD[name])
-
         /*  create LRU cache  */
         this._cache = new CacheLRU()
     }
@@ -47,14 +40,6 @@ class AEL {
     /*  return the version information  */
     version () {
         return AELVersion
-    }
-
-    /*  register an additional function  */
-    func (name, func) {
-        if (arguments.length !== 2)
-            throw new Error("AEL#func: invalid number of arguments")
-        this._funcs.register(name, func)
-        return this
     }
 
     /*  configure the LRU cache limit  */
@@ -83,30 +68,30 @@ class AEL {
     }
 
     /*  individual step 2: execute AST  */
-    execute (ast, params, vars, trace) {
+    execute (ast, vars, trace) {
         if (arguments.length < 1)
             throw new Error("AEL#execute: too less arguments")
-        if (arguments.length > 4)
+        if (arguments.length > 3)
             throw new Error("AEL#execute: too many arguments")
-        if (params === undefined)
-            params = {}
+        if (vars === undefined)
+            vars = {}
         if (trace === undefined)
             trace = false
-        return ast.execute(params, vars, this._funcs, trace)
+        return ast.execute(vars, trace)
     }
 
     /*  all-in-one step  */
-    evaluate (expr, params, vars, trace) {
+    evaluate (expr, vars, trace) {
         if (arguments.length < 1)
             throw new Error("AEL#evaluate: too less arguments")
-        if (arguments.length > 4)
+        if (arguments.length > 3)
             throw new Error("AEL#evaluate: too many arguments")
-        if (params === undefined)
-            params = {}
+        if (vars === undefined)
+            vars = {}
         if (trace === undefined)
             trace = false
         const ast = this.compile(expr, trace)
-        return this.execute(ast, params, vars, trace)
+        return this.execute(ast, vars, trace)
     }
 }
 
