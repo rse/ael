@@ -37,38 +37,50 @@ Expression Language
 
 ### By Grammar
 
-FIXME
-
+    //  top-level
     expr             ::= conditional
                        | logical
                        | bitwise
                        | relational
                        | arithmentical
-                       | function-call
-                       | attribute-ref
-                       | query-parameter
+                       | functional
+                       | selective
+                       | variable
                        | literal
                        | parenthesis
-                       | sub-query
+
+    //  expressions
     conditional      ::= expr "?" expr ":" expr
                        | expr "?:" expr
     logical          ::= expr ("&&" | "||") expr
                        | "!" expr
-    bitwise          ::= expr ("&" | "|" | "<<" | ">>") expr
+    bitwise          ::= expr ("&" | "^" | "|" | "<<" | ">>") expr
                        | "~" expr
     relational       ::= expr ("==" | "!=" | "<=" | ">=" | "<" | ">" | "=~" | "!~") expr
     arithmethical    ::= expr ("+" | "-" | "*" | "/" | "%" | "**") expr
-    function-call    ::= id "(" (expr ("," expr)*)? ")"
-    attribute-ref    ::= "@" (id | string)
-    query-parameter  ::= "{" id "}"
-    id               ::= /[a-zA-Z_][a-zA-Z0-9_-]*/
-    literal          ::= string | regexp | number | value
-    string           ::= /"(\\"|.)*"/ | /'(\\'|.)*'/
-    regexp           ::= /`(\\`|.)*`/
-    number           ::= /\d+(\.\d+)?$/
-    value            ::= "true" | "false" | "null" | "NaN" | "undefined"
+    functional       ::= expr "?."? "(" (expr ("," expr)*)? ")"
+    selective        ::= expr "?."? "." ud
+                       | expr "?."? "[" expr "]"
+    variable         ::= id
+    literal          ::= array | object | string | regexp | number | value
     parenthesis      ::= "(" expr ")"
-    sub-query        ::= path           // <-- ESSENTIAL RECURSION !!
+
+    //  literals
+    id               ::= /[a-zA-Z_][a-zA-Z0-9_-]*/
+    array            ::= "[" (expr ("," expr)*)? "]"
+    object           ::= "{" (key ":" expr ("," key ":" expr)*)? "}"
+    key              ::= "[" expr "]"
+                       | id
+    string           ::= /"(\\"|.)*"/
+                       | /'(\\'|.)*'/
+    regexp           ::= /`(\\`|.)*`/
+    number           ::= /[+-]?/ number-value
+    number-value     ::= "0b" /[01]+/
+                       | "0o" /[0-7]+/
+                       | "0x" /[0-9a-fA-F]+/
+                       | /[0-9]*\.[0-9]+([eE][+-]?[0-9]+)?/
+                       | /[0-9]+/
+    value            ::= "true" | "false" | "null" | "NaN" | "undefined"
 
 Application Programming Interface (API)
 ---------------------------------------
@@ -77,31 +89,30 @@ Application Programming Interface (API)
 declare module "AEL" {
     class AEL {
         /*  create AEL instance  */
-        public constructor()
-
-        /*  set AST cache size  */
-        public cache (
-            entries: number          /*  number of AST cache entries  */
-        ): AEL
+        public constructor(
+            options?: {
+                cache?:    number,   /*  number of LRU-cached ASTs (default: 0)  */
+                trace?: (            /*  optional tracing callback (default: null)  */
+                    msg: string      /*  tracing message  */
+                ) => void
+            }
+        )
 
         /*  individual step 1: compile (and cache) expression into AST  */
         compile(
-            expr:          string,   /*  expression string  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            expr:          string    /*  expression string  */
         ): any                       /*  abstract syntax tree  */
 
         /*  individual step 2: execute AST  */
         execute(
             ast:           any,      /*  abstract syntax tree  */
-            vars:          object,   /*  expression variables  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            vars:          object    /*  expression variables  */
         ): void
 
         /*  all-in-one step: evaluate (compile and execute) expression  */
         evaluate(
             expr:          string,   /*  expression string  */
-            vars:          object,   /*  expression variables  */
-            trace?:        boolean   /*  whether to output trace information (default: false)  */
+            vars:          object    /*  expression variables  */
         ): any
     }
     export = AEL

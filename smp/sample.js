@@ -3,7 +3,7 @@ const AEL = require("..")
 
 try {
     let result = new AEL({ trace: (msg) => console.log(msg) })
-        .evaluate(`foo.bar?.quux?.()`, { foo: { bar: { quux: () => 42 } } }, true)
+        .evaluate(`foo =~ /^foo$/`, { foo: "foo" })
     console.log(result)
 }
 catch (ex) {
