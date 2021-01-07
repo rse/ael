@@ -66,48 +66,66 @@ exprLogicalAnd
     /   exprRelational
 
 exprRelational
-    =   e1:exprBitwiseOr _ op:$("==" / "!=" / "<=" / ">=" / "<" / ">" / "=~" / "!~") _ e2:exprRelational {
-            return ast("Relational").set({ op: op }).add(e1, e2)
+    =   head:exprBitwiseOr tail:(_ ("==" / "!=" / "<=" / ">=" / "<" / ">" / "=~" / "!~") _ exprBitwiseOr)+ {
+            return tail.reduce((result, element) => {
+                return ast("Relational").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprBitwiseOr
 
 exprBitwiseOr
-    =   e1:exprBitwiseXOr _ op:$("|") _ e2:exprBitwiseOr {
-            return ast("Bitwise").set({ op: op }).add(e1, e2)
+    =   head:exprBitwiseXOr tail:(_ "|" _ e2:exprBitwiseXOr)+ {
+            return tail.reduce((result, element) => {
+                return ast("Bitwise").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprBitwiseXOr
 
 exprBitwiseXOr
-    =   e1:exprBitwiseAnd _ op:$("^") _ e2:exprBitwiseXOr {
-            return ast("Bitwise").set({ op: op }).add(e1, e2)
+    =   head:exprBitwiseAnd tail:(_ "^" _ exprBitwiseAnd)+ {
+            return tail.reduce((result, element) => {
+                return ast("Bitwise").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprBitwiseAnd
 
 exprBitwiseAnd
-    =   e1:exprBitwiseShift _ op:$("&") _ e2:exprBitwiseAnd {
-            return ast("Bitwise").set({ op: op }).add(e1, e2)
+    =   head:exprBitwiseShift tail:(_ "&" _ exprBitwiseShift)+ {
+            return tail.reduce((result, element) => {
+                return ast("Bitwise").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprBitwiseShift
 
 exprBitwiseShift
-    =   e1:exprAdditive _ op:$("<<" / ">>") _ e2:exprBitwiseShift {
-            return ast("Bitwise").set({ op: op }).add(e1, e2)
+    =   head:exprAdditive tail:(_ ("<<" / ">>") _ exprAdditive)+ {
+            return tail.reduce((result, element) => {
+                return ast("Bitwise").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprAdditive
 
 exprAdditive
-    =   f:exprMultiplicative l:(_ ("+" / "-") _ exprMultiplicative)+ {
-            return l.reduce((n, l) => {
-                return ast("Arithmetical").set({ op: l[1] }).add(n, l[3])
-            }, f)
+    =   head:exprMultiplicative tail:(_ ("+" / "-") _ exprMultiplicative)+ {
+            return tail.reduce((result, element) => {
+                return ast("Arithmetical").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprMultiplicative
 
 exprMultiplicative
-    =   f:exprUnary l:(_ ("**" / "*" / "/" / "%") _ exprUnary)+ {
-            return l.reduce((n, l) => {
-                return ast("Arithmetical").set({ op: l[1] }).add(n, l[3])
-            }, f)
+    =   head:exprExponential tail:(_ ("*" / "/" / "%") _ exprExponential)+ {
+            return tail.reduce((result, element) => {
+                return ast("Arithmetical").set({ op: element[1] }).add(result, element[3])
+            }, head)
+        }
+    /   exprExponential
+
+exprExponential
+    =   head:(exprUnary _ "**" _)+ tail:exprUnary {
+            return head.reduceRight((result, element) => {
+                return ast("Arithmetical").set({ op: element[2] }).add(element[0], result)
+            }, tail)
         }
     /   exprUnary
 
@@ -124,8 +142,10 @@ exprFunctionCall
     /   exprSelect
 
 exprFunctionCallParams
-    =   f:expr l:(_ "," _ expr)* { /* RECURSION */
-            return unroll(f, l, 3)
+    =   head:expr tail:(_ "," _ expr)* { /* RECURSION */
+            return tail.reduce((result, element) => {
+                return [ ...result, element[3] ]
+            }, [ head ])
         }
 
 exprSelect
