@@ -19,9 +19,9 @@ const data = {
 }
 
 const expr = `
-    grant =~ /^login:(.+)$/ ? session.user.login  =~ $1 :
-    grant =~ /^email:(.+)$/ ? session.email.login =~ $1 :
-    grant =~ /^token:(.+)$/ ? session.tokens      >= $1 : false
+    grant =~ /^login:(.+)$/ ? session.user.login =~ $1 :
+    grant =~ /^email:(.+)$/ ? session.user.email =~ $1 :
+    grant =~ /^token:(.+)$/ ? session.tokens     >= $1 : false
 `
 
 const grants = [
