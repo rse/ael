@@ -61,5 +61,9 @@ describe("AEL Library", () => {
         expectEvaluate("true && true || false && false")
             .to.be.equal(true)
     })
+    it("arithmentical expressions", () => {
+        expectEvaluate("1 + 2 + 3 - 4 * 5 - 6 / 8 + 9")
+            .to.be.equal(-5.75)
+    })
 })
 
