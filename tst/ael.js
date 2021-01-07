@@ -65,5 +65,9 @@ describe("AEL Library", () => {
         expectEvaluate("1 + 2 + 3 - 4 * 5 - 6 / 8 + 9")
             .to.be.equal(-5.75)
     })
+    it("relational expressions", () => {
+        expectEvaluate("'foo' =~ /^fo/")
+            .to.be.equal(true)
+    })
 })
 
