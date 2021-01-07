@@ -58,6 +58,8 @@ export default class AELTrace {
             result = "undefined"
         else if (typeof val === "function")
             result = `[Function: ${val.name}]`
+        else if (typeof val === "object" && val instanceof RegExp)
+            result = val.toString()
         else
             result = JSON.stringify(val)
         if (result.length > 40)
