@@ -35,23 +35,47 @@ Usage
 
 ```
 $ cat sample.js
-const AEL = require("..")
+const AEL = require("ael")
 
-const ael = new AEL({ trace: (msg) => console.log(msg) })
-
-const expr = `foo.quux =~ /ux$/ && foo.bar.a == 1`
+const ael = new AEL({
+    trace: (msg) => console.log(msg)
+})
 
 const data = {
-    foo: {
-        bar: { a: 1, b: 2, c: 3 },
-        baz: [ "a", "b", "c", "d", "e" ],
-        quux: "quux"
-    }
+    session: {
+        user: {
+            login: "rse",
+            email: "rse@engelschall.com"
+        },
+        tokens: [
+            "455c3026-50cf-11eb-8d93-7085c287160d",
+            "4600b07e-50cf-11eb-8d57-7085c287160d"
+        ]
+    },
 }
 
+const expr = `
+    grant =~ /^login:(.+)$/ ? session.user.login  =~ $1 :
+    grant =~ /^email:(.+)$/ ? session.email.login =~ $1 :
+    grant =~ /^token:(.+)$/ ? session.tokens      >= $1 : false
+`
+
+const grants = [
+    "login:^(?:rse|foo|bar)$",
+    "email:^.+@engelschall\\.com$",
+    "email:^.+@example\\.com$",
+    "token:4600b07e-50cf-11eb-8d57-7085c287160d"
+]
+
 try {
-    const result = ael.evaluate(expr, data)
-    console.log("RESULT", result)
+    let granted = false
+    for (const grant of grants) {
+        if (ael.evaluate(expr, { ...data, grant })) {
+            granted = true
+            break
+        }
+    }
+    console.log("GRANTED", granted)
 }
 catch (ex) {
     console.log("ERROR", ex.toString())
@@ -59,49 +83,68 @@ catch (ex) {
 
 $ node sample.js
 compile: +---(expression string)---------------------------------------------------------------------------------
-compile: | foo.quux =~ /ux$/ && foo.bar.a == 1
+compile: |
+compile: |     grant =~ /^login:(.+)$/ ? session.user.login  =~ $1 :
+compile: |     grant =~ /^email:(.+)$/ ? session.email.login =~ $1 :
+compile: |     grant =~ /^token:(.+)$/ ? session.tokens      >= $1 : false
 compile: +---(abstract syntax tree)------------------------------------------------------------------------------
-compile: | Logical (op: "&&", expr: "foo.quux =~ /ux$/ && foo.bar.a == 1") [1,1]
-compile: | ├── Relational (op: "=~") [1,1]
-compile: | │   ├── Select [1,1]
-compile: | │   │   ├── Variable (id: "foo") [1,1]
-compile: | │   │   └── SelectItem [1,4]
-compile: | │   │       └── Identifier (id: "quux") [1,5]
-compile: | │   └── LiteralRegExp (value: /ux$/) [1,13]
-compile: | └── Relational (op: "==") [1,22]
-compile: |     ├── Select [1,22]
-compile: |     │   ├── Variable (id: "foo") [1,22]
-compile: |     │   ├── SelectItem [1,25]
-compile: |     │   │   └── Identifier (id: "bar") [1,26]
-compile: |     │   └── SelectItem [1,29]
-compile: |     │       └── Identifier (id: "a") [1,30]
-compile: |     └── LiteralNumber (value: 1) [1,35]
+compile: | ConditionalTernary (expr: "\n    grant =~ /^login:(.+)$/ ? session.user.login  =~ $1 :\n    grant =~ /^email:(.+)$/ ? session.email.login =~ $1 :\n    grant =~ /^token:(.+)$/ ? session.tokens      >= $1 : false\n") [2,5]
+compile: | ├── Relational (op: "=~") [2,5]
+compile: | │   ├── Variable (id: "grant") [2,5]
+compile: | │   └── LiteralRegExp (value: /^login:(.+)$/) [2,14]
+compile: | ├── Relational (op: "=~") [2,31]
+compile: | │   ├── Select [2,31]
+compile: | │   │   ├── Variable (id: "session") [2,31]
+compile: | │   │   ├── SelectItem [2,38]
+compile: | │   │   │   └── Identifier (id: "user") [2,39]
+compile: | │   │   └── SelectItem [2,43]
+compile: | │   │       └── Identifier (id: "login") [2,44]
+compile: | │   └── Variable (id: "$1") [2,54]
+compile: | └── ConditionalTernary [3,5]
+compile: |     ├── Relational (op: "=~") [3,5]
+compile: |     │   ├── Variable (id: "grant") [3,5]
+compile: |     │   └── LiteralRegExp (value: /^email:(.+)$/) [3,14]
+compile: |     ├── Relational (op: "=~") [3,31]
+compile: |     │   ├── Select [3,31]
+compile: |     │   │   ├── Variable (id: "session") [3,31]
+compile: |     │   │   ├── SelectItem [3,38]
+compile: |     │   │   │   └── Identifier (id: "email") [3,39]
+compile: |     │   │   └── SelectItem [3,44]
+compile: |     │   │       └── Identifier (id: "login") [3,45]
+compile: |     │   └── Variable (id: "$1") [3,54]
+compile: |     └── ConditionalTernary [4,5]
+compile: |         ├── Relational (op: "=~") [4,5]
+compile: |         │   ├── Variable (id: "grant") [4,5]
+compile: |         │   └── LiteralRegExp (value: /^token:(.+)$/) [4,14]
+compile: |         ├── Relational (op: ">=") [4,31]
+compile: |         │   ├── Select [4,31]
+compile: |         │   │   ├── Variable (id: "session") [4,31]
+compile: |         │   │   └── SelectItem [4,38]
+compile: |         │   │       └── Identifier (id: "tokens") [4,39]
+compile: |         │   └── Variable (id: "$1") [4,54]
+compile: |         └── LiteralValue (value: false) [4,59]
 execute: +---(evaluation recursion tree)-------------------------------------------------------------------------
-execute: | Logical {
+execute: | ConditionalTernary {
 execute: |     Relational {
-execute: |         Select {
-execute: |             Variable {
-execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
-execute: |                 Identifier {
-execute: |                 }: "quux"
-execute: |         }: "quux"
+execute: |         Variable {
+execute: |         }: "login:^(?:rse|foo|bar)$"
 execute: |         LiteralRegExp {
 execute: |         }: {}
 execute: |     }: true
 execute: |     Relational {
 execute: |         Select {
 execute: |             Variable {
-execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
+execute: |             }: {"user":{"login":"rse","email":"rse@enge...
 execute: |                 Identifier {
-execute: |                 }: "bar"
+execute: |                 }: "user"
 execute: |                 Identifier {
-execute: |                 }: "a"
-execute: |         }: 1
-execute: |         LiteralNumber {
-execute: |         }: 1
+execute: |                 }: "login"
+execute: |         }: "rse"
+execute: |         Variable {
+execute: |         }: "^(?:rse|foo|bar)$"
 execute: |     }: true
 execute: | }: true
-RESULT true
+GRANTED true
 ```
 
 Expression Language
