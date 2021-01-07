@@ -65,9 +65,9 @@ class AEL {
 
         /*  tracing operation  */
         if (this.options.trace !== null)
-            this.options.trace("AEL: compile: +---(expression string)-----------------" +
+            this.options.trace("compile: +---(expression string)-----------------" +
                 "----------------------------------------------------------------\n" +
-                expr.replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+                expr.replace(/\n$/, "").replace(/^/mg, "compile: | "))
 
         /*  try to fetch pre-compiled AST  */
         let ast = this._cache.get(expr)
@@ -100,9 +100,9 @@ class AEL {
 
         /*  tracing operation  */
         if (this.options.trace !== null)
-            this.options.trace("AEL: compile: +---(abstract syntax tree)--------------" +
+            this.options.trace("compile: +---(abstract syntax tree)--------------" +
                 "----------------------------------------------------------------\n" +
-                ast.dump().replace(/\n$/, "").replace(/^/mg, "AEL: compile: | "))
+                ast.dump().replace(/\n$/, "").replace(/^/mg, "compile: | "))
 
         return ast
     }
@@ -121,7 +121,7 @@ class AEL {
 
         /*  tracing operation  */
         if (this.options.trace !== null)
-            this.options.trace("AEL: execute: +---(evaluation recursion tree)---------" +
+            this.options.trace("execute: +---(evaluation recursion tree)---------" +
                 "----------------------------------------------------------------")
 
         /*  evaluate the AST  */

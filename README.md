@@ -56,49 +56,49 @@ catch (ex) {
 }
 
 $ node sample.js
-AEL: compile: +---(expression string)---------------------------------------------------------------------------------
-AEL: compile: | foo.quux =~ /ux$/ && foo.bar.a == 1
-AEL: compile: +---(abstract syntax tree)------------------------------------------------------------------------------
-AEL: compile: | Logical (op: "&&", expr: "foo.quux =~ /ux$/ && foo.bar.a == 1") [1,1]
-AEL: compile: | ├── Relational (op: "=~") [1,1]
-AEL: compile: | │   ├── Select [1,1]
-AEL: compile: | │   │   ├── Variable (id: "foo") [1,1]
-AEL: compile: | │   │   └── SelectItem [1,4]
-AEL: compile: | │   │       └── Identifier (id: "quux") [1,5]
-AEL: compile: | │   └── LiteralRegExp (value: /ux$/) [1,13]
-AEL: compile: | └── Relational (op: "==") [1,22]
-AEL: compile: |     ├── Select [1,22]
-AEL: compile: |     │   ├── Variable (id: "foo") [1,22]
-AEL: compile: |     │   ├── SelectItem [1,25]
-AEL: compile: |     │   │   └── Identifier (id: "bar") [1,26]
-AEL: compile: |     │   └── SelectItem [1,29]
-AEL: compile: |     │       └── Identifier (id: "a") [1,30]
-AEL: compile: |     └── LiteralNumber (value: 1) [1,35]
-AEL: execute: +---(evaluation recursion tree)-------------------------------------------------------------------------
-AEL: execute: | Logical {
-AEL: execute: |     Relational {
-AEL: execute: |         Select {
-AEL: execute: |             Variable {
-AEL: execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
-AEL: execute: |                 Identifier {
-AEL: execute: |                 }: "quux"
-AEL: execute: |         }: "quux"
-AEL: execute: |         LiteralRegExp {
-AEL: execute: |         }: {}
-AEL: execute: |     }: true
-AEL: execute: |     Relational {
-AEL: execute: |         Select {
-AEL: execute: |             Variable {
-AEL: execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
-AEL: execute: |                 Identifier {
-AEL: execute: |                 }: "bar"
-AEL: execute: |                 Identifier {
-AEL: execute: |                 }: "a"
-AEL: execute: |         }: 1
-AEL: execute: |         LiteralNumber {
-AEL: execute: |         }: 1
-AEL: execute: |     }: true
-AEL: execute: | }: true
+compile: +---(expression string)---------------------------------------------------------------------------------
+compile: | foo.quux =~ /ux$/ && foo.bar.a == 1
+compile: +---(abstract syntax tree)------------------------------------------------------------------------------
+compile: | Logical (op: "&&", expr: "foo.quux =~ /ux$/ && foo.bar.a == 1") [1,1]
+compile: | ├── Relational (op: "=~") [1,1]
+compile: | │   ├── Select [1,1]
+compile: | │   │   ├── Variable (id: "foo") [1,1]
+compile: | │   │   └── SelectItem [1,4]
+compile: | │   │       └── Identifier (id: "quux") [1,5]
+compile: | │   └── LiteralRegExp (value: /ux$/) [1,13]
+compile: | └── Relational (op: "==") [1,22]
+compile: |     ├── Select [1,22]
+compile: |     │   ├── Variable (id: "foo") [1,22]
+compile: |     │   ├── SelectItem [1,25]
+compile: |     │   │   └── Identifier (id: "bar") [1,26]
+compile: |     │   └── SelectItem [1,29]
+compile: |     │       └── Identifier (id: "a") [1,30]
+compile: |     └── LiteralNumber (value: 1) [1,35]
+execute: +---(evaluation recursion tree)-------------------------------------------------------------------------
+execute: | Logical {
+execute: |     Relational {
+execute: |         Select {
+execute: |             Variable {
+execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
+execute: |                 Identifier {
+execute: |                 }: "quux"
+execute: |         }: "quux"
+execute: |         LiteralRegExp {
+execute: |         }: {}
+execute: |     }: true
+execute: |     Relational {
+execute: |         Select {
+execute: |             Variable {
+execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
+execute: |                 Identifier {
+execute: |                 }: "bar"
+execute: |                 Identifier {
+execute: |                 }: "a"
+execute: |         }: 1
+execute: |         LiteralNumber {
+execute: |         }: 1
+execute: |     }: true
+execute: | }: true
 RESULT true
 ```
 
