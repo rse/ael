@@ -1,22 +1,22 @@
 {
-    "name":        "ael",
-    "version":     "0.9.3",
-    "description": "Advanced Expression Language",
-    "keywords":    [ "expression", "language", "evaluation" ],
-    "license":     "MIT",
-    "browser":     "lib/ael.browser.js",
-    "main":        "lib/ael.node.js",
+    "name":                       "ael",
+    "version":                    "0.9.3",
+    "description":                "Advanced Expression Language",
+    "keywords":                   [ "expression", "language", "parser", "evaluator" ],
+    "license":                    "MIT",
+    "browser":                    "lib/ael.browser.js",
+    "main":                       "lib/ael.node.js",
     "repository": {
-        "type": "git",
-        "url":  "https://github.com/rse/ael.git"
+        "type":                   "git",
+        "url":                    "https://github.com/rse/ael.git"
     },
     "author": {
-        "name":  "Dr. Ralf S. Engelschall",
-        "email": "rse@engelschall.com",
-        "url":   "http://engelschall.com"
+        "name":                   "Dr. Ralf S. Engelschall",
+        "email":                  "rse@engelschall.com",
+        "url":                    "http://engelschall.com"
     },
-    "homepage": "https://github.com/rse/ael",
-    "bugs":     "https://github.com/rse/ael/issues",
+    "homepage":                   "https://github.com/rse/ael",
+    "bugs":                       "https://github.com/rse/ael/issues",
     "dependencies": {
         "pegjs":                  "0.10.0",
         "pegjs-otf":              "1.2.17",
@@ -51,7 +51,7 @@
         "node":                   ">=10.0.0"
     },
     "scripts": {
-        "prepublishOnly":  "grunt default",
-        "build":           "grunt default"
+        "prepublishOnly":         "grunt default",
+        "build":                  "grunt default"
     }
 }
