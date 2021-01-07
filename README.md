@@ -197,7 +197,7 @@ declare module "AEL" {
 Implementation Notice
 ---------------------
 
-Although AEL is written in ECMAScript 2018, it is transpiled to older
+Although AEL is written in ECMAScript 2020, it is transpiled to older
 environments and this way runs in really all current (as of 2021)
 JavaScript environments, of course.
 
