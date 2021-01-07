@@ -55,9 +55,9 @@ const data = {
 }
 
 const expr = `
-    grant =~ /^login:(.+)$/ ? session.user.login =~ $1 :
-    grant =~ /^email:(.+)$/ ? session.user.email =~ $1 :
-    grant =~ /^token:(.+)$/ ? session.tokens     >= $1 : false
+    grant =~ /^login:(.+)$/ ? session?.user?.login =~ $1 :
+    grant =~ /^email:(.+)$/ ? session?.user?.email =~ $1 :
+    grant =~ /^token:(.+)$/ ? session?.tokens      >= $1 : false
 `
 
 const grants = [
@@ -84,22 +84,22 @@ catch (ex) {
 $ node sample.js
 compile: +---(expression string)---------------------------------------------------------------------------------
 compile: |
-compile: |     grant =~ /^login:(.+)$/ ? session.user.login =~ $1 :
-compile: |     grant =~ /^email:(.+)$/ ? session.user.email =~ $1 :
-compile: |     grant =~ /^token:(.+)$/ ? session.tokens     >= $1 : false
+compile: |     grant =~ /^login:(.+)$/ ? session?.user?.login =~ $1 :
+compile: |     grant =~ /^email:(.+)$/ ? session?.user?.email =~ $1 :
+compile: |     grant =~ /^token:(.+)$/ ? session?.tokens      >= $1 : false
 compile: +---(abstract syntax tree)------------------------------------------------------------------------------
-compile: | ConditionalTernary (expr: "\n    grant =~ /^login:(.+)$/ ? session.user.login =~ $1 :\n    grant =~ /^email:(.+)$/ ? session.user.email =~ $1 :\n    grant =~ /^token:(.+)$/ ? session.tokens     >= $1 : false\n") [2,5]
+compile: | ConditionalTernary [2,5]
 compile: | ├── Relational (op: "=~") [2,5]
 compile: | │   ├── Variable (id: "grant") [2,5]
 compile: | │   └── LiteralRegExp (value: /^login:(.+)$/) [2,14]
 compile: | ├── Relational (op: "=~") [2,31]
 compile: | │   ├── Select [2,31]
 compile: | │   │   ├── Variable (id: "session") [2,31]
-compile: | │   │   ├── SelectItem [2,38]
-compile: | │   │   │   └── Identifier (id: "user") [2,39]
-compile: | │   │   └── SelectItem [2,43]
-compile: | │   │       └── Identifier (id: "login") [2,44]
-compile: | │   └── Variable (id: "$1") [2,53]
+compile: | │   │   ├── SelectItem (optional: true) [2,38]
+compile: | │   │   │   └── Identifier (id: "user") [2,40]
+compile: | │   │   └── SelectItem (optional: true) [2,44]
+compile: | │   │       └── Identifier (id: "login") [2,46]
+compile: | │   └── Variable (id: "$1") [2,55]
 compile: | └── ConditionalTernary [3,5]
 compile: |     ├── Relational (op: "=~") [3,5]
 compile: |     │   ├── Variable (id: "grant") [3,5]
@@ -107,11 +107,11 @@ compile: |     │   └── LiteralRegExp (value: /^email:(.+)$/) [3,14]
 compile: |     ├── Relational (op: "=~") [3,31]
 compile: |     │   ├── Select [3,31]
 compile: |     │   │   ├── Variable (id: "session") [3,31]
-compile: |     │   │   ├── SelectItem [3,38]
-compile: |     │   │   │   └── Identifier (id: "user") [3,39]
-compile: |     │   │   └── SelectItem [3,43]
-compile: |     │   │       └── Identifier (id: "email") [3,44]
-compile: |     │   └── Variable (id: "$1") [3,53]
+compile: |     │   │   ├── SelectItem (optional: true) [3,38]
+compile: |     │   │   │   └── Identifier (id: "user") [3,40]
+compile: |     │   │   └── SelectItem (optional: true) [3,44]
+compile: |     │   │       └── Identifier (id: "email") [3,46]
+compile: |     │   └── Variable (id: "$1") [3,55]
 compile: |     └── ConditionalTernary [4,5]
 compile: |         ├── Relational (op: "=~") [4,5]
 compile: |         │   ├── Variable (id: "grant") [4,5]
@@ -119,10 +119,10 @@ compile: |         │   └── LiteralRegExp (value: /^token:(.+)$/) [4,14]
 compile: |         ├── Relational (op: ">=") [4,31]
 compile: |         │   ├── Select [4,31]
 compile: |         │   │   ├── Variable (id: "session") [4,31]
-compile: |         │   │   └── SelectItem [4,38]
-compile: |         │   │       └── Identifier (id: "tokens") [4,39]
-compile: |         │   └── Variable (id: "$1") [4,53]
-compile: |         └── LiteralValue (value: false) [4,58]
+compile: |         │   │   └── SelectItem (optional: true) [4,38]
+compile: |         │   │       └── Identifier (id: "tokens") [4,40]
+compile: |         │   └── Variable (id: "$1") [4,55]
+compile: |         └── LiteralValue (value: false) [4,60]
 execute: +---(evaluation recursion tree)-------------------------------------------------------------------------
 execute: | ConditionalTernary {
 execute: |     Relational {
