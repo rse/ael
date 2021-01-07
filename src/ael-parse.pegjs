@@ -226,7 +226,8 @@ exprLiteralObjectItem
         }
 
 exprLiteralOther
-    =   string
+    =   template
+    /   string
     /   regexp
     /   number
     /   value
@@ -243,6 +244,41 @@ exprParenthesis
 id "identifier"
     =   id:$(!value [a-zA-Z_$][a-zA-Z0-9_$-]*) {
             return ast("Identifier").set({ id: id })
+        }
+
+template
+    =   "`" l:(templateInterpolation / templateString)* "`" {
+            return ast("LiteralTemplate").add(l)
+        }
+
+templateInterpolation
+    =   "${" _ e:expr _ "}" {
+            return e
+        }
+
+templateString
+    =   s:$((templateEscapedChar / templateChar)+) {
+            return ast("LiteralString").set({ value: s })
+        }
+
+templateChar "template string character"
+    =   $(!"`" !"${" .)
+
+templateEscapedChar "escaped template string character"
+    =   "\\\\" { return "\\"   }
+    /   "\\`"  { return "`"    }
+    /   "\\b"  { return "\b"   }
+    /   "\\v"  { return "\x0B" }
+    /   "\\f"  { return "\f"   }
+    /   "\\t"  { return "\t"   }
+    /   "\\r"  { return "\r"   }
+    /   "\\n"  { return "\n"   }
+    /   "\\e"  { return "\x1B" }
+    /   "\\x" n:$([0-9a-fA-F][0-9a-fA-F]) {
+            return String.fromCharCode(parseInt(n, 16))
+        }
+    /   "\\u" n:$([0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]) {
+            return String.fromCharCode(parseInt(n, 16))
         }
 
 string "quoted string literal"

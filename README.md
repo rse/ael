@@ -182,7 +182,7 @@ functional       ::= expr "?."? "(" (expr ("," expr)*)? ")"
 selective        ::= expr "?."? "." ud
                    | expr "?."? "[" expr "]"
 variable         ::= id
-literal          ::= array | object | string | regexp | number | value
+literal          ::= array | object | template | string | regexp | number | value
 parenthesis      ::= "(" expr ")"
 
 //  literals
@@ -191,6 +191,7 @@ array            ::= "[" (expr ("," expr)*)? "]"
 object           ::= "{" (key ":" expr ("," key ":" expr)*)? "}"
 key              ::= "[" expr "]"
                    | id
+template         ::= "`" ("${" expr "}" / ("\\`"|.))* "`"
 string           ::= /"(\\"|.)*"/
                    | /'(\\'|.)*'/
 regexp           ::= /`(\\`|.)*`/

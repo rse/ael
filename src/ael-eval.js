@@ -66,6 +66,7 @@ export default class AELEval extends AELTrace {
             case "LiteralArray":       return this.evalLiteralArray(N)
             case "LiteralObject":      return this.evalLiteralObject(N)
             case "LiteralObjectItem":  return this.evalLiteralObjectItem(N)
+            case "LiteralTemplate":    return this.evalLiteralTemplate(N)
             case "LiteralString":      return this.evalLiteralString(N)
             case "LiteralRegExp":      return this.evalLiteralRegExp(N)
             case "LiteralNumber":      return this.evalLiteralNumber(N)
@@ -521,6 +522,16 @@ export default class AELEval extends AELTrace {
         const key = this.eval(N.child(0))
         const val = this.eval(N.child(1))
         const result = { [key]: val }
+        this.traceEnd(N, result)
+        return result
+    }
+
+    /*  evaluate template literal  */
+    evalLiteralTemplate (N) {
+        this.traceBegin(N)
+        const result = N.childs()
+            .map((child) => this.eval(child))
+            .join("")
         this.traceEnd(N, result)
         return result
     }
