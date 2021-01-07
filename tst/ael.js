@@ -22,11 +22,6 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* global describe: false */
-/* global it: false */
-/* jshint -W030 */
-/* eslint no-unused-expressions: 0 */
-
 const chai = require("chai")
 const expect = chai.expect
 chai.config.includeStack = true
