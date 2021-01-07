@@ -241,7 +241,7 @@ exprParenthesis
 */
 
 id "identifier"
-    =   id:$(!value [a-zA-Z_][a-zA-Z0-9_-]*) {
+    =   id:$(!value [a-zA-Z_$][a-zA-Z0-9_$-]*) {
             return ast("Identifier").set({ id: id })
         }
 

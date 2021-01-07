@@ -159,6 +159,7 @@ export default class AELEval extends AELTrace {
         let v1 = this.eval(N.child(0))
         let v2 = this.eval(N.child(1))
         let result
+        let match
         switch (N.get("op")) {
             case "==":
                 switch (util.typePair(v1, v2)) {
@@ -275,10 +276,24 @@ export default class AELEval extends AELTrace {
                 }
                 break
             case "=~":
-                result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) !== null
+                match = util.coerce(v1, "string").match(util.coerce(v2, "regexp"))
+                result = (match !== null)
+                for (let i = 0; i <= 9; i++) {
+                    if (match !== null && i < match.length)
+                        this.state[`$${i}`] = match[i]
+                    else
+                        delete this.state[`$${i}`]
+                }
                 break
             case "!~":
-                result = util.coerce(v1, "string").match(util.coerce(v2, "regexp")) === null
+                match = util.coerce(v1, "string").match(util.coerce(v2, "regexp"))
+                result = (match === null)
+                for (let i = 0; i <= 9; i++) {
+                    if (match !== null && i < match.length)
+                        this.state[`$${i}`] = match[i]
+                    else
+                        delete this.state[`$${i}`]
+                }
                 break
         }
         this.traceEnd(N, result)

@@ -1,21 +1,45 @@
 
 const AEL = require("..")
 
-const ael = new AEL({ trace: (msg) => console.log(msg) })
-
-const expr = `foo.quux =~ /ux$/ && foo.bar.a == 1`
+const ael = new AEL({
+    trace: (msg) => console.log(msg)
+})
 
 const data = {
-    foo: {
-        bar: { a: 1, b: 2, c: 3 },
-        baz: [ "a", "b", "c", "d", "e" ],
-        quux: "quux"
-    }
+    session: {
+        user: {
+            login: "rse",
+            email: "rse@engelschall.com"
+        },
+        tokens: [
+            "455c3026-50cf-11eb-8d93-7085c287160d",
+            "4600b07e-50cf-11eb-8d57-7085c287160d"
+        ]
+    },
 }
 
+const expr = `
+    grant =~ /^login:(.+)$/ ? session.user.login  =~ $1 :
+    grant =~ /^email:(.+)$/ ? session.email.login =~ $1 :
+    grant =~ /^token:(.+)$/ ? session.tokens      >= $1 : false
+`
+
+const grants = [
+    "login:^(?:rse|foo|bar)$",
+    "email:^.+@engelschall\\.com$",
+    "email:^.+@example\\.com$",
+    "token:4600b07e-50cf-11eb-8d57-7085c287160d"
+]
+
 try {
-    const result = ael.evaluate(expr, data)
-    console.log("RESULT", result)
+    let granted = false
+    for (const grant of grants) {
+        if (ael.evaluate(expr, { ...data, grant })) {
+            granted = true
+            break
+        }
+    }
+    console.log("GRANTED", granted)
 }
 catch (ex) {
     console.log("ERROR", ex.toString())
