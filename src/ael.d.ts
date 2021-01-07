@@ -27,28 +27,30 @@ declare module "AEL" {
         /*  create AEL instance  */
         public constructor(
             options?: {
-                cache?:    number,   /*  number of LRU-cached ASTs (default: 0)  */
-                trace?: (            /*  optional tracing callback (default: null)  */
-                    msg: string      /*  tracing message  */
+                cache?:    number,   /*  number of LRU-cached ASTs (default: 0)      */
+                trace?: (            /*  optional tracing callback (default: null)   */
+                    msg:   string    /*  tracing message                             */
                 ) => void
             }
         )
 
         /*  individual step 1: compile (and cache) expression into AST  */
         compile(
-            expr:          string    /*  expression string  */
-        ): any                       /*  abstract syntax tree  */
+            expr:          string    /*  expression string                           */
+        ): any                       /*  abstract syntax tree                        */
 
         /*  individual step 2: execute AST  */
         execute(
-            ast:           any,      /*  abstract syntax tree  */
-            vars:          object    /*  expression variables  */
+            ast:           any,      /*  abstract syntax tree                        */
+            vars?:         object,   /*  data variables  (read-only)  (default: {})  */
+            state?:        object    /*  state variables (read-write) (default: {})  */
         ): void
 
         /*  all-in-one step: evaluate (compile and execute) expression  */
         evaluate(
-            expr:          string,   /*  expression string  */
-            vars:          object    /*  expression variables  */
+            expr:          string,   /*  expression string                           */
+            vars?:         object,   /*  data variables  (read-only)  (default: {})  */
+            state?:        object    /*  state variables (read-write) (default: {})  */
         ): any
     }
     export = AEL

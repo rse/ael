@@ -29,10 +29,11 @@ import AELError        from "./ael-error.js"
 
 /*  the exported class  */
 export default class AELEval extends AELTrace {
-    constructor (expr, vars, trace) {
+    constructor (expr, vars, state, trace) {
         super(trace)
-        this.expr = expr
-        this.vars = vars
+        this.expr  = expr
+        this.vars  = vars
+        this.state = state
     }
 
     /*  raise an error  */
@@ -49,6 +50,8 @@ export default class AELEval extends AELTrace {
     /*  evaluate an arbitrary node  */
     eval (N) {
         switch (N.type()) {
+            case "Sequence":           return this.evalSequence(N)
+            case "Assignment":         return this.evalAssignment(N)
             case "ConditionalBinary":  return this.evalConditionalBinary(N)
             case "ConditionalTernary": return this.evalConditionalTernary(N)
             case "Logical":            return this.evalLogical(N)
@@ -70,6 +73,26 @@ export default class AELEval extends AELTrace {
             default:
                 throw this.error(N, "eval", "invalid AST node (should not happen)")
         }
+    }
+
+    /*  evaluate sequence  */
+    evalSequence (N) {
+        this.traceBegin(N)
+        let result
+        for (const child of N.childs())
+            result = this.eval(child)
+        this.traceEnd(N, result)
+        return result
+    }
+
+    /*  evaluate assignment  */
+    evalAssignment (N) {
+        this.traceBegin(N)
+        let id     = this.eval(N.child(0))
+        let result = this.eval(N.child(1))
+        this.state[id] = result
+        this.traceEnd(N, result)
+        return result
     }
 
     /*  evaluate conditional binary operator  */
@@ -448,9 +471,9 @@ export default class AELEval extends AELTrace {
     evalVariable (N) {
         this.traceBegin(N)
         let id = N.get("id")
-        if (typeof this.vars[id] === "undefined")
+        if (!(id in this.state) && !(id in this.vars))
             throw this.error(N, "evalVariable", "invalid variable reference")
-        let result = this.vars[id]
+        let result = (id in this.state ? this.state[id] : this.vars[id])
         this.traceEnd(N, result)
         return result
     }

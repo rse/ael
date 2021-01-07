@@ -108,7 +108,7 @@ class AEL {
     }
 
     /*  individual step 2: execute AST  */
-    execute (ast, vars) {
+    execute (ast, vars, state) {
         /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#execute: too less arguments")
@@ -118,6 +118,8 @@ class AEL {
         /*  provide defaults  */
         if (vars === undefined)
             vars = {}
+        if (state === undefined)
+            state = {}
 
         /*  tracing operation  */
         if (this.options.trace !== null)
@@ -126,12 +128,12 @@ class AEL {
 
         /*  evaluate the AST  */
         const expr = ast.get("expr")
-        const evaluator = new AELEval(expr, vars, this.options.trace)
+        const evaluator = new AELEval(expr, vars, state, this.options.trace)
         return evaluator.eval(ast)
     }
 
     /*  all-in-one step  */
-    evaluate (expr, vars) {
+    evaluate (expr, vars, state) {
         /*  sanity check usage  */
         if (arguments.length < 1)
             throw new Error("AEL#evaluate: too less arguments")
@@ -141,10 +143,12 @@ class AEL {
         /*  provide defaults  */
         if (vars === undefined)
             vars = {}
+        if (state === undefined)
+            state = {}
 
         /*  compile and evaluate expression  */
         const ast = this.compile(expr)
-        return this.execute(ast, vars)
+        return this.execute(ast, vars, state)
     }
 }
 

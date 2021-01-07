@@ -38,7 +38,21 @@ expression
         }
 
 expr
-    =   exprConditional
+    =   exprSequence
+
+exprSequence
+    =   head:exprAssignment tail:(_ "," _ exprAssignment)+ {
+            return tail.reduce((result, element) => {
+                return result.add(element[3])
+            }, ast("Sequence").add(head))
+        }
+    /   exprAssignment
+
+exprAssignment
+    =   id:id _ "=" !"=" _ val:exprConditional {
+            return ast("Assignment").add(id, val)
+        }
+    /   exprConditional
 
 exprConditional
     =   e1:exprLogicalOr _ "?" _ e2:exprConditional _ ":" _ e3:exprConditional {
