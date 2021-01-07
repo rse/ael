@@ -156,7 +156,7 @@ exprFunctionCall
     /   exprSelect
 
 exprFunctionCallParams
-    =   head:expr tail:(_ "," _ expr)* { /* RECURSION */
+    =   head:exprAssignment tail:(_ "," _ exprAssignment)* { /* RECURSION */
             return tail.reduce((result, element) => {
                 return [ ...result, element[3] ]
             }, [ head ])
@@ -200,7 +200,7 @@ exprLiteralArray
         }
 
 exprLiteralArrayItems
-    =   f:expr l:(_ "," _ expr)* { /* RECURSION */
+    =   f:exprAssignment l:(_ "," _ exprAssignment)* { /* RECURSION */
             return unroll(f, l, 3)
         }
 
@@ -218,10 +218,10 @@ exprLiteralObjectItems
         }
 
 exprLiteralObjectItem
-    =   key:(string / id) _ ":" _ e:expr { /* RECURSION */
+    =   key:(string / id) _ ":" _ e:exprAssignment { /* RECURSION */
             return ast("LiteralObjectItem").add(key, e)
         }
-    /   "[" _ key:expr _ "]" _ ":" _ e:expr { /* RECURSION */
+    /   "[" _ key:expr _ "]" _ ":" _ e:exprAssignment { /* RECURSION */
             return ast("LiteralObjectItem").add(key, e)
         }
 
