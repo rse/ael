@@ -92,7 +92,7 @@ class AEL {
                 })
             }
             ast = result.ast
-            ast.set("expr", expr)
+            ast.set("__expr", expr)
 
             /*  cache AST for subsequent usages  */
             this._cache.set(expr, ast)
@@ -127,7 +127,7 @@ class AEL {
                 "----------------------------------------------------------------")
 
         /*  evaluate the AST  */
-        const expr = ast.get("expr")
+        const expr = ast.get("__expr")
         const evaluator = new AELEval(expr, vars, state, this.options.trace)
         return evaluator.eval(ast)
     }
