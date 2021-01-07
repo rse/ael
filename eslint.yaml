@@ -68,4 +68,5 @@ rules:
     lines-between-class-members:         off
     quote-props:                         off
     multiline-ternary:                   off
+    no-template-curly-in-string:         off
 
