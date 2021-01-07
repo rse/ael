@@ -24,10 +24,10 @@
 
 /* global module: true */
 module.exports = function (grunt) {
-    grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-browserify");
-    grunt.loadNpmTasks("grunt-mocha-test");
-    grunt.loadNpmTasks("grunt-eslint");
+    grunt.loadNpmTasks("grunt-contrib-clean")
+    grunt.loadNpmTasks("grunt-browserify")
+    grunt.loadNpmTasks("grunt-mocha-test")
+    grunt.loadNpmTasks("grunt-eslint")
 
     grunt.initConfig({
         eslint: {
@@ -112,9 +112,9 @@ module.exports = function (grunt) {
             clean: [],
             distclean: [ "node_modules" ]
         }
-    });
+    })
 
-    grunt.registerTask("default", [ "eslint", "browserify", "mochaTest" ]);
-    grunt.registerTask("test", [ "browserify:ael-node", "mochaTest" ]);
-};
+    grunt.registerTask("default", [ "eslint", "browserify", "mochaTest" ])
+    grunt.registerTask("test", [ "browserify:ael-node", "mochaTest" ])
+}
 
