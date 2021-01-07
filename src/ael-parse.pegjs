@@ -50,14 +50,18 @@ exprConditional
     /   exprLogicalOr
 
 exprLogicalOr
-    =   e1:exprLogicalAnd _ op:$("||") _ e2:exprLogicalOr {
-            return ast("Logical").set({ op: op }).add(e1, e2)
+    =   head:exprLogicalAnd tail:(_ "||" _ exprLogicalAnd)+ {
+            return tail.reduce((result, element) => {
+                return ast("Logical").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprLogicalAnd
 
 exprLogicalAnd
-    =   e1:exprRelational _ op:$("&&") _ e2:exprLogicalAnd {
-            return ast("Logical").set({ op: op }).add(e1, e2)
+    =   head:exprRelational tail:(_ "&&" _ e2:exprRelational)+ {
+            return tail.reduce((result, element) => {
+                return ast("Logical").set({ op: element[1] }).add(result, element[3])
+            }, head)
         }
     /   exprRelational
 
@@ -92,14 +96,18 @@ exprBitwiseShift
     /   exprAdditive
 
 exprAdditive
-    =   e1:exprMultiplicative _ op:$("+" / "-") _ e2:exprAdditive {
-            return ast("Arithmetical").set({ op: op }).add(e1, e2)
+    =   f:exprMultiplicative l:(_ ("+" / "-") _ exprMultiplicative)+ {
+            return l.reduce((n, l) => {
+                return ast("Arithmetical").set({ op: l[1] }).add(n, l[3])
+            }, f)
         }
     /   exprMultiplicative
 
 exprMultiplicative
-    =   e1:exprUnary _ op:$("**" / "*" / "/" / "%") _ e2:exprMultiplicative {
-            return ast("Arithmetical").set({ op: op }).add(e1, e2)
+    =   f:exprUnary l:(_ ("**" / "*" / "/" / "%") _ exprUnary)+ {
+            return l.reduce((n, l) => {
+                return ast("Arithmetical").set({ op: l[1] }).add(n, l[3])
+            }, f)
         }
     /   exprUnary
 
