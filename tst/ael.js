@@ -40,16 +40,17 @@ describe("AEL Library", () => {
         expect(ael).to.respondTo("execute")
         expect(ael).to.respondTo("evaluate")
     })
-    it("simple expressions", () => {
+    it("literal expressions", () => {
         expect(ael.evaluate("true")).to.be.equal(true)
         expect(ael.evaluate("42")).to.be.equal(42)
         expect(ael.evaluate("42 + 7")).to.be.equal(49)
     })
-    it("variable expressions", () => {
-        expect(ael.evaluate("foo + bar", { foo: "foo", bar: "bar" })).to.be.equal("foobar")
+    it("conditional expressions", () => {
+        expect(ael.evaluate("a > 0 ? b : c", { a: 1, b: 2, c: 3 })).to.be.equal(2)
+        expect(ael.evaluate("a > 0 ? b > 1 ? true : false : c", { a: 1, b: 2, c: 3 })).to.be.equal(true)
     })
-    it("function calls", () => {
-        expect(ael.evaluate("foo() + bar.baz()", { foo: () => 42, bar: { baz: () => 7 } }), true).to.be.equal(49)
+    it("boolean expressions", () => {
+        expect(ael.evaluate("a && b || c && d", { a: true, b: true, c: false, d: false })).to.be.equal(true)
     })
 })
 
