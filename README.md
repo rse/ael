@@ -2,7 +2,7 @@
 AEL
 ===
 
-Advanced Expression Language (AEL)
+**Advanced Expression Language (AEL)**
 
 <p/>
 <img src="https://nodei.co/npm/ael.png?downloads=true&stars=true" alt=""/>
