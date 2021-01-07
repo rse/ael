@@ -121,7 +121,7 @@ expr             ::= conditional
 
 //  expressions
 conditional      ::= expr "?" expr ":" expr
-                   | expr "?:" expr
+                   | expr "??" expr
 logical          ::= expr ("&&" | "||") expr
                    | "!" expr
 bitwise          ::= expr ("&" | "^" | "|" | "<<" | ">>") expr
