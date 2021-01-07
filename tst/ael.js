@@ -29,23 +29,37 @@ chai.config.includeStack = true
 const AEL = require("../lib/ael.node.js")
 
 describe("AEL Library", () => {
-    const ael = new AEL()
+    const ael = new AEL({
+        trace: (msg) => console.log(msg)
+    })
+    const data = {
+        foo:  42,
+        bar:  { baz: { quux: "quux" } },
+        quux: [ undefined, true, false, null, NaN, 0b11, 7, 0o7, 0xF, "quux", "quux", "quux" ]
+    }
+    const expectEvaluate = (expr) =>
+        expect(ael.evaluate(expr, data))
     it("API availability", () => {
         expect(ael).to.respondTo("compile")
         expect(ael).to.respondTo("execute")
         expect(ael).to.respondTo("evaluate")
     })
     it("literal expressions", () => {
-        expect(ael.evaluate("true")).to.be.equal(true)
-        expect(ael.evaluate("42")).to.be.equal(42)
-        expect(ael.evaluate("42 + 7")).to.be.equal(49)
+        expectEvaluate("quux[0]").to.be.equal(undefined)
+        expectEvaluate("quux")
+            .to.be.deep.equal(data.quux)
+        expectEvaluate("quux == [ undefined, true, false, null, NaN, 0b11, 7, 0o7, 0xF, \"quux\", 'quux', `quux` ]")
+            .to.be.equal(true)
+        expectEvaluate("`foo${\"bar\"}quux`")
+            .to.be.equal("foobarquux")
     })
     it("conditional expressions", () => {
-        expect(ael.evaluate("a > 0 ? b : c", { a: 1, b: 2, c: 3 })).to.be.equal(2)
-        expect(ael.evaluate("a > 0 ? b > 1 ? true : false : c", { a: 1, b: 2, c: 3 })).to.be.equal(true)
+        expectEvaluate("42 > 7 ? 'foo' : 'bar'")
+            .to.be.equal("foo")
     })
     it("boolean expressions", () => {
-        expect(ael.evaluate("a && b || c && d", { a: true, b: true, c: false, d: false })).to.be.equal(true)
+        expectEvaluate("true && true || false && false")
+            .to.be.equal(true)
     })
 })
 
