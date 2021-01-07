@@ -1,19 +1,12 @@
 {
-    "name":             "astq-sample",
+    "name":             "sample",
     "version":          "0.0.0",
     "dependencies": {
-        "acorn":        "7.3.1",
-        "parse5":       "6.0.1",
-        "xmldom":       "0.3.0",
-        "less":         "3.12.2",
-        "cheerio":      "1.0.0-rc.3",
-        "unified":      "9.1.0",
-        "remark-parse": "8.0.3"
     },
     "scripts": {
         "start":        "node sample.js"
     },
     "engines": {
-        "node":         ">=8.0.0"
+        "node":         ">=10.0.0"
     }
 }
