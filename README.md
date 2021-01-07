@@ -15,12 +15,13 @@ About
 
 Advanced Expression Language (AEL) is a JavaScript library for use
 in the Browser and Node.js to parse/compile and execute/evaluate
-JavaScript-style expressions. The expressions are based on conditional,
-logical, bitwise, relational, arithmetical, functional, selective and
-literal constructs and hence can express arbitrary complex matchings and
-lookups. The result can be an arbitrary value, but usually is just a
-boolean one. AEL is primarily intended to be used for evaluating
-access control rules or expanding template variables.
+JavaScript-style expressions. The expressions are based on sequence,
+assignment, conditional, logical, bitwise, relational, arithmetical,
+functional, selective and literal constructs and hence can express
+arbitrary complex matchings and lookups. The result can be an arbitrary
+value, but usually is just a boolean one. AEL is primarily intended
+to be used for evaluating access control rules or expanding template
+variables.
 
 Installation
 ------------
@@ -110,7 +111,9 @@ The following BNF-style grammar shows the supported expression language:
 
 ```
 //  top-level
-expr             ::= conditional
+expr             ::= sequence
+                   | assignment
+                   | conditional
                    | logical
                    | bitwise
                    | relational
@@ -122,6 +125,8 @@ expr             ::= conditional
                    | parenthesis
 
 //  expressions
+sequence         ::= expr ("," expr)+
+assignment       ::= id "=" expr
 conditional      ::= expr "?" expr ":" expr
                    | expr "??" expr
 logical          ::= expr ("&&" | "||") expr
