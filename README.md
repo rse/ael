@@ -99,6 +99,7 @@ AEL: execute: |         LiteralNumber {
 AEL: execute: |         }: 1
 AEL: execute: |     }: true
 AEL: execute: | }: true
+RESULT true
 ```
 
 Expression Language
