@@ -19,7 +19,8 @@ JavaScript-style expressions. The expressions are based on conditional,
 logical, bitwise, relational, arithmetical, functional, selective and
 literal constructs and hence can express arbitrary complex matchings and
 lookups. The result can be an arbitrary value, but usually is just a
-boolean one.
+boolean one. AEL is primarily intended to be used for evaluating
+access control rules or expanding template variables.
 
 Installation
 ------------
