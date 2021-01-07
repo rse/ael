@@ -33,10 +33,72 @@ Usage
 
 ```
 $ cat sample.js
-FIXME
+const AEL = require("..")
+
+const ael = new AEL({ trace: (msg) => console.log(msg) })
+
+const expr = `foo.quux =~ /ux$/ && foo.bar.a == 1`
+
+const data = {
+    foo: {
+        bar: { a: 1, b: 2, c: 3 },
+        baz: [ "a", "b", "c", "d", "e" ],
+        quux: "quux"
+    }
+}
+
+try {
+    const result = ael.evaluate(expr, data)
+    console.log("RESULT", result)
+}
+catch (ex) {
+    console.log("ERROR", ex.toString())
+}
 
 $ node sample.js
-FIXME
+AEL: compile: +---(expression string)---------------------------------------------------------------------------------
+AEL: compile: | foo.quux =~ /ux$/ && foo.bar.a == 1
+AEL: compile: +---(abstract syntax tree)------------------------------------------------------------------------------
+AEL: compile: | Logical (op: "&&", expr: "foo.quux =~ /ux$/ && foo.bar.a == 1") [1,1]
+AEL: compile: | ├── Relational (op: "=~") [1,1]
+AEL: compile: | │   ├── Select [1,1]
+AEL: compile: | │   │   ├── Variable (id: "foo") [1,1]
+AEL: compile: | │   │   └── SelectItem [1,4]
+AEL: compile: | │   │       └── Identifier (id: "quux") [1,5]
+AEL: compile: | │   └── LiteralRegExp (value: /ux$/) [1,13]
+AEL: compile: | └── Relational (op: "==") [1,22]
+AEL: compile: |     ├── Select [1,22]
+AEL: compile: |     │   ├── Variable (id: "foo") [1,22]
+AEL: compile: |     │   ├── SelectItem [1,25]
+AEL: compile: |     │   │   └── Identifier (id: "bar") [1,26]
+AEL: compile: |     │   └── SelectItem [1,29]
+AEL: compile: |     │       └── Identifier (id: "a") [1,30]
+AEL: compile: |     └── LiteralNumber (value: 1) [1,35]
+AEL: execute: +---(evaluation recursion tree)-------------------------------------------------------------------------
+AEL: execute: | Logical {
+AEL: execute: |     Relational {
+AEL: execute: |         Select {
+AEL: execute: |             Variable {
+AEL: execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
+AEL: execute: |                 Identifier {
+AEL: execute: |                 }: "quux"
+AEL: execute: |         }: "quux"
+AEL: execute: |         LiteralRegExp {
+AEL: execute: |         }: {}
+AEL: execute: |     }: true
+AEL: execute: |     Relational {
+AEL: execute: |         Select {
+AEL: execute: |             Variable {
+AEL: execute: |             }: {"bar":{"a":1,"b":2,"c":3},"baz":["a","b...
+AEL: execute: |                 Identifier {
+AEL: execute: |                 }: "bar"
+AEL: execute: |                 Identifier {
+AEL: execute: |                 }: "a"
+AEL: execute: |         }: 1
+AEL: execute: |         LiteralNumber {
+AEL: execute: |         }: 1
+AEL: execute: |     }: true
+AEL: execute: | }: true
 ```
 
 Expression Language
