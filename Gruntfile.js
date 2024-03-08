@@ -32,7 +32,7 @@ module.exports = function (grunt) {
     grunt.initConfig({
         eslint: {
             options: {
-                configFile: "eslint.yaml"
+                overrideConfigFile: "eslint.yaml"
             },
             "ael": [ "src/**/*.js", "tst/**/*.js" ]
         },
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
                             presets: [
                                 [ "@babel/preset-env", {
                                     "targets": {
-                                        "node": "10.0.0"
+                                        "node": "18.0.0"
                                     }
                                 } ]
                             ]

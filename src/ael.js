@@ -34,7 +34,7 @@ import AELError    from "./ael-error.js"
 /*  get expression parser (by loading and on-the-fly compiling PEG.js grammar)  */
 const PEG = require("pegjs-otf")
 const AELParser = PEG.generateFromFile(
-    /* eslint node/no-path-concat: off */
+    /* eslint n/no-path-concat: off */
     __dirname + "/ael-parse.pegjs",
     { optimize: "speed", cache: true }
 )

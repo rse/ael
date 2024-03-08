@@ -55,7 +55,7 @@ export default class AELError extends Error {
         if (params.code && params.line && params.column) {
             this.report = sourceCodeError({
                 type:     "ERROR",
-                message:  message,
+                message,
                 ...(params.origin ? { origin: params.origin } : {}),
                 code:     params.code,
                 line:     params.line,

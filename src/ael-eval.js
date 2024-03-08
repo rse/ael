@@ -40,7 +40,7 @@ export default class AELEval extends AELTrace {
     error (N, origin, message) {
         let pos = N.pos()
         return new AELError(message, {
-            origin: origin,
+            origin,
             code:   this.expr,
             line:   pos.line,
             column: pos.column
