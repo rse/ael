@@ -47,6 +47,16 @@ export default class AELEval extends AELTrace {
         })
     }
 
+    /*  set regex match groups in state  */
+    setMatchGroups (match) {
+        for (let i = 0; i <= 9; i++) {
+            if (match !== null && i < match.length)
+                this.state[`$${i}`] = match[i]
+            else
+                delete this.state[`$${i}`]
+        }
+    }
+
     /*  evaluate an arbitrary node  */
     eval (N) {
         switch (N.type()) {
@@ -279,22 +289,12 @@ export default class AELEval extends AELTrace {
             case "=~":
                 match = util.coerce(v1, "string").match(util.coerce(v2, "regexp"))
                 result = (match !== null)
-                for (let i = 0; i <= 9; i++) {
-                    if (match !== null && i < match.length)
-                        this.state[`$${i}`] = match[i]
-                    else
-                        delete this.state[`$${i}`]
-                }
+                this.setMatchGroups(match)
                 break
             case "!~":
                 match = util.coerce(v1, "string").match(util.coerce(v2, "regexp"))
                 result = (match === null)
-                for (let i = 0; i <= 9; i++) {
-                    if (match !== null && i < match.length)
-                        this.state[`$${i}`] = match[i]
-                    else
-                        delete this.state[`$${i}`]
-                }
+                this.setMatchGroups(match)
                 break
         }
         this.traceEnd(N, result)
