@@ -63,7 +63,7 @@ export default class AELTrace {
         else
             result = JSON.stringify(val)
         if (result.length > 40)
-            result = result.substr(0, 40) + "..."
+            result = result.substring(0, 40) + "..."
         this.trace("execute: | " + prefix + "}: " + result)
     }
 }
