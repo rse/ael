@@ -339,7 +339,7 @@ export default class AELEval extends AELTrace {
                 switch (util.typePair(v1, v2)) {
                     case "string:any": {
                         let i = v1.indexOf(v2)
-                        result = i >= 0 ? v1.splice(i, v2.length) : v1
+                        result = i >= 0 ? (v1.slice(0, i) + v1.slice(i + v2.length)) : v1
                         break
                     }
                     case "array:array":
