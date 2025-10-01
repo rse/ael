@@ -59,7 +59,7 @@ class AEL {
     compile (expr) {
         /*  sanity check usage  */
         if (arguments.length < 1)
-            throw new Error("AEL#compile: too less arguments")
+            throw new Error("AEL#compile: too few arguments")
         if (arguments.length > 2)
             throw new Error("AEL#compile: too many arguments")
 
@@ -111,7 +111,7 @@ class AEL {
     execute (ast, vars, state) {
         /*  sanity check usage  */
         if (arguments.length < 1)
-            throw new Error("AEL#execute: too less arguments")
+            throw new Error("AEL#execute: too few arguments")
         if (arguments.length > 3)
             throw new Error("AEL#execute: too many arguments")
 
@@ -136,7 +136,7 @@ class AEL {
     evaluate (expr, vars, state) {
         /*  sanity check usage  */
         if (arguments.length < 1)
-            throw new Error("AEL#evaluate: too less arguments")
+            throw new Error("AEL#evaluate: too few arguments")
         if (arguments.length > 3)
             throw new Error("AEL#evaluate: too many arguments")
 
