@@ -22,7 +22,7 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*  load internal depdendencies  */
+/*  load internal dependencies  */
 import util            from "./ael-util.js"
 import AELTrace        from "./ael-trace.js"
 import AELError        from "./ael-error.js"

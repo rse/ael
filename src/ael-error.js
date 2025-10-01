@@ -22,7 +22,7 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*  load external depdendencies  */
+/*  load external dependencies  */
 import sourceCodeError from "source-code-error"
 
 /*  the exported class  */

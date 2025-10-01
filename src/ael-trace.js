@@ -22,7 +22,7 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*  load internal depdendencies  */
+/*  load internal dependencies  */
 import util from "./ael-util.js"
 
 /*  the exported class  */

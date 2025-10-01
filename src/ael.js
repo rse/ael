@@ -22,7 +22,7 @@
 **  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*  load external depdendencies  */
+/*  load external dependencies  */
 import CacheLRU    from "cache-lru"
 import ASTY        from "asty"
 import PEGUtil     from "pegjs-util"
